@@ -25,3 +25,20 @@ El script instala `pyinstaller` si hace falta y genera el binario en `dist/`. Un
 ```
 
 El ejecutable solo sirve para la plataforma en la que se construye (no es multiplataforma).
+
+### Instalador para Windows
+
+`installer/` contiene un instalador estilo Windows clásico (asistente con pantalla de bienvenida, selección de carpeta, barra de progreso, accesos directos en el Menú Inicio/Escritorio y desinstalador desde "Agregar o quitar programas").
+
+Se genera **en un equipo Windows** (PyInstaller no compila de forma cruzada, así que el `.exe` de la app debe construirse en el propio Windows). Pasos, una sola vez:
+
+1. Instala Python 3 desde [python.org](https://www.python.org/) (incluye `tkinter`).
+2. Instala [NSIS](https://nsis.sourceforge.io/Download).
+
+Luego, desde una consola (`cmd`) dentro de la carpeta `installer`:
+
+```bat
+build_installer.bat
+```
+
+Esto compila `calculadora_gui.py` a `installer\dist_windows\calculadora_gui.exe` con PyInstaller y genera `installer\CalculadoraSumasSetup.exe` con NSIS. Ese único archivo es el instalador: al ejecutarlo, el usuario final no necesita lanzar nada más ni tener Python instalado.
