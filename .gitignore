@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+graphify-out/
+
+# Los Excel reales no se suben al repositorio (incluida la salida PRUEBAESTANDAR.xlsx)
+*.xlsx
+~$*.xlsx
+!tests/**/*.xlsx
