@@ -1,0 +1,51 @@
+name: Compilar PRUEBAESTANDAR.exe
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "pruebaestandar/**"
+      - "PRUEBAESTANDAR.pyw"
+      - "requirements.txt"
+      - ".github/workflows/compilar-exe.yml"
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt pyinstaller
+
+      - name: Pruebas
+        run: python -m pytest -q -m "not lento" --ignore=tests/test_gui.py
+
+      - name: Compilar
+        run: pyinstaller --noconfirm --clean --onefile --windowed --name PRUEBAESTANDAR PRUEBAESTANDAR.pyw
+
+      - name: Comprobar que la ventana se abre
+        shell: pwsh
+        run: |
+          $proc = Start-Process -FilePath "dist\PRUEBAESTANDAR.exe" -PassThru
+          $abierta = $false
+          for ($i = 0; $i -lt 60 -and -not $abierta; $i++) {
+            Start-Sleep -Milliseconds 500
+            $abierta = [bool](Get-Process -Name PRUEBAESTANDAR -ErrorAction SilentlyContinue |
+              Where-Object { $_.MainWindowTitle -eq "PRUEBAESTANDAR" })
+          }
+          Get-Process -Name PRUEBAESTANDAR -ErrorAction SilentlyContinue | Stop-Process -Force
+          if (-not $abierta) { throw "La ventana PRUEBAESTANDAR no se ha abierto" }
+          Write-Host "Ventana PRUEBAESTANDAR abierta correctamente"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PRUEBAESTANDAR-windows
+          path: dist/PRUEBAESTANDAR.exe
+          retention-days: 90
