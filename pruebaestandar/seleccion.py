@@ -25,9 +25,17 @@ def _clave_codigo(codigo):
     return (0, codigo, "") if isinstance(codigo, int) else (1, 0, str(codigo))
 
 
-def _clave(art: Articulo, idx: int, lineas: Fraction, cajas: int):
-    # Mayor índice LÍNEAS/(cajas+1); empates: sin cajas, más líneas, menor volumen, menor código.
-    return (-Fraction(lineas) / (cajas + 1), cajas > 0, -lineas, art.volumen, _clave_codigo(art.codigo), idx)
+def _clave(art: Articulo, idx: int, lineas: Fraction, bultos: Fraction, cajas: int):
+    # Mayor índice LÍNEAS/(cajas+1); empates: sin cajas, más líneas, más bultos, menor volumen, menor código.
+    return (
+        -Fraction(lineas) / (cajas + 1),
+        cajas > 0,
+        -lineas,
+        -bultos,
+        art.volumen,
+        _clave_codigo(art.codigo),
+        idx,
+    )
 
 
 def seleccionar(
@@ -44,7 +52,7 @@ def seleccionar(
     for i, art in enumerate(articulos):
         if art.valido and bultos[i] > 0:
             maximos[i] = maximo_cajas(bultos[i], dias)
-            heapq.heappush(cola, _clave(art, i, lineas[i], 0))
+            heapq.heappush(cola, _clave(art, i, lineas[i], bultos[i], 0))
 
     cajas: dict[int, int] = {}
     peso = vol = Fraction(0)
@@ -63,7 +71,7 @@ def seleccionar(
         peso, vol = nuevo_peso, nuevo_vol
         q = cajas[i] = cajas.get(i, 0) + 1
         if q < maximos[i]:
-            heapq.heappush(cola, _clave(art, i, lineas[i], q))
+            heapq.heappush(cola, _clave(art, i, lineas[i], bultos[i], q))
         holgura = densidad * vol - peso
         while aparcados and aparcados[0][0] < holgura:
             heapq.heappush(cola, heapq.heappop(aparcados)[1])

@@ -49,7 +49,7 @@ Si algo no cuadra (encabezados, tiendas repetidas o que faltan, valores no numé
 2. **Máximo de cajas por artículo:** ⌈BULTOS / nº de días⌉ (redondeo hacia arriba).
 3. **Capacidad:** PALET = 1 medio; CARRO = 2 medios (2 × peso y 2 × volumen).
 4. **Restricciones, siempre:** peso total ≤ peso máximo, volumen total ≤ volumen máximo y densidad de la selección (kg/L) **estrictamente menor** que la del medio.
-5. **Reparto proporcional a las líneas:** las cajas se asignan de una en una. Cada caja siguiente va al artículo con mayor índice `LÍNEAS / (cajas ya asignadas + 1)` cuya caja todavía cabe (como el reparto de escaños D'Hondt). En caso de empate gana, por este orden: el artículo que aún no tiene cajas, el de más líneas, el de menor volumen y el de menor código.
+5. **Reparto proporcional a las líneas:** las cajas se asignan de una en una. Cada caja siguiente va al artículo con mayor índice `LÍNEAS / (cajas ya asignadas + 1)` cuya caja todavía cabe (como el reparto de escaños D'Hondt). En caso de empate gana, por este orden: el artículo que aún no tiene cajas, el de más líneas, el de **más bultos de salida en la tienda** (lo que decide, sobre todo, entre los artículos de 1 o 2 líneas), el de menor volumen y el de menor código.
    - Por eso, los artículos con más líneas entran antes y llevan más cajas, y los de pocas líneas llevan menos o ninguna.
    - Si una caja no cabe, se prueba la del siguiente artículo, para aprovechar el hueco con más variedad.
    - Un artículo muy denso puede entrar más tarde, cuando las cajas ligeras ya elegidas bajan la densidad del conjunto.

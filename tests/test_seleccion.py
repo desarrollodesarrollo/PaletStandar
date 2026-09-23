@@ -49,6 +49,25 @@ def test_empate_prefiere_articulo_nuevo():
     assert sel == {0: 1, 1: 1}
 
 
+def test_pocas_lineas_prefiere_mas_bultos():
+    arts = [articulo(0, 1, 10), articulo(1, 1, 10), articulo(2, 1, 10)]
+    sel = seleccionar(arts, fr([12, 3, 7]), fr([1, 1, 1]), medio(volumen=10, **HOLGADO), dias=5)
+    assert sel == {0: 1}
+
+
+def test_mas_bultos_manda_sobre_menor_volumen():
+    # dos artículos de 2 líneas: el de más salida gana aunque su caja sea más grande
+    arts = [articulo(0, 1, 8), articulo(1, 1, 15)]
+    sel = seleccionar(arts, fr([2, 9]), fr([2, 2]), medio(volumen=16, **HOLGADO), dias=1)
+    assert sel == {1: 1}
+
+
+def test_mas_lineas_sigue_mandando_sobre_bultos():
+    arts = [articulo(0, 1, 10), articulo(1, 1, 10)]
+    sel = seleccionar(arts, fr([1, 50]), fr([2, 1]), medio(volumen=10, **HOLGADO), dias=1)
+    assert sel == {0: 1}
+
+
 def test_empate_prefiere_menor_volumen_y_luego_menor_codigo():
     arts = [articulo(0, 1, 12, codigo=5), articulo(1, 1, 10, codigo=9), articulo(2, 1, 10, codigo=7)]
     sel = seleccionar(arts, fr([1, 1, 1]), fr([3, 3, 3]), medio(volumen=10, **HOLGADO), dias=1)

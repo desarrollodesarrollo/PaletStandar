@@ -45,7 +45,7 @@ Alternativa: un único script. Descartado porque impide probar el algoritmo sin 
 ### 3. Algoritmo de selección por tienda (cocientes tipo D'Hondt con cola de prioridad)
 Por cada tienda:
 1. Elegibles = artículos con BULTOS > 0 y peso/volumen válidos. `max_i = ceil(BULTOS_i / días)` con aritmética entera/`Fraction` (evita que 10/5 dé 2.0000001 → 3).
-2. Cola de prioridad (`heapq`) con clave `(-L_i/(q_i+1), q_i>0, -L_i, volumen_i, código_i)`; el índice se compara como `Fraction(L_i, q_i+1)` para que los empates sean exactos.
+2. Cola de prioridad (`heapq`) con clave `(-L_i/(q_i+1), q_i>0, -L_i, -BULTOS_i, volumen_i, código_i)`; el índice se compara como `Fraction(L_i, q_i+1)` para que los empates sean exactos. El desempate por BULTOS (petición del usuario tras la revisión) decide sobre todo entre artículos de 1–2 líneas, que empatan con frecuencia.
 3. Se extrae el mejor candidato y se prueba su caja siguiente:
    - Si cabe (P+p ≤ Pmax, V+v ≤ Vmax y (P+p) < d·(V+v)), se asigna, se incrementa `q_i` y, si `q_i < max_i`, se reinserta con su nuevo índice.
    - Si no cabe por **peso o volumen**, el artículo se descarta definitivamente (los totales sólo crecen, nunca volverá a caber).

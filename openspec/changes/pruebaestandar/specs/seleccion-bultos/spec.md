@@ -75,13 +75,17 @@ Estas restricciones MUST cumplirse sin excepción; si no cabe nada, la tienda qu
 - **THEN** el artículo denso puede entrar siempre que la densidad del conjunto siga por debajo de la del medio
 
 ### Requirement: Reparto de cajas proporcional a las líneas
-Para cada tienda, el sistema SHALL asignar las cajas de una en una. En cada paso, entre los artículos elegibles que no han alcanzado su máximo y cuya caja siguiente cabe respetando todas las restricciones, SHALL recibir la caja el de mayor índice LÍNEAS / (cajas ya asignadas + 1). En caso de empate SHALL preferirse, por este orden: el artículo que aún no tiene ninguna caja, el de más líneas, el de menor volumen por caja y el de menor código. El proceso SHALL terminar cuando ninguna caja más quepa o todos los artículos elegibles tengan su máximo.
+Para cada tienda, el sistema SHALL asignar las cajas de una en una. En cada paso, entre los artículos elegibles que no han alcanzado su máximo y cuya caja siguiente cabe respetando todas las restricciones, SHALL recibir la caja el de mayor índice LÍNEAS / (cajas ya asignadas + 1). En caso de empate SHALL preferirse, por este orden: el artículo que aún no tiene ninguna caja, el de más líneas, el de más BULTOS de salida en esa tienda, el de menor volumen por caja y el de menor código. Este criterio de bultos es el que decide, en la práctica, entre los artículos de 1 o 2 líneas, que son los que más empatan. El proceso SHALL terminar cuando ninguna caja más quepa o todos los artículos elegibles tengan su máximo.
 
 Como consecuencia observable, a igualdad de máximos y de encaje, un artículo con más líneas MUST recibir al menos tantas cajas como uno con menos líneas.
 
 #### Scenario: Más líneas, más cajas
 - **WHEN** en una tienda el artículo A tiene 10 líneas y máximo 5 cajas, el B tiene 4 líneas y máximo 5 cajas, y sólo caben 3 cajas del mismo tamaño
 - **THEN** A recibe 2 cajas (índices 10 y 5) y B recibe 1 (índice 4)
+
+#### Scenario: Pocas líneas, más salida de bultos primero
+- **WHEN** tres artículos de 1 línea tienen 12, 3 y 7 BULTOS en la tienda y sólo cabe 1 caja
+- **THEN** se elige el artículo de 12 BULTOS
 
 #### Scenario: Una caja que no cabe no bloquea al resto
 - **WHEN** el siguiente artículo por índice tiene una caja de 30 L y sólo quedan 12 L libres

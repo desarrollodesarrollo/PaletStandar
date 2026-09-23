@@ -20,6 +20,7 @@
 - [x] 3.2 Implementar `seleccionar()` con cola de prioridad por índice LÍNEAS/(cajas+1), desempates (sin cajas, más líneas, menor volumen, menor código), descarte definitivo por peso/volumen y lista de espera por densidad; verificar con la prueba "A 10 líneas, B 4 líneas, caben 3 cajas → A=2, B=1"
 - [x] 3.3 Añadir pruebas de los escenarios de la spec `seleccion-bultos`: caja que no cabe no bloquea al resto, artículo denso compensado por ligeros, selección demasiado densa rechazada, todo cabe → todos al máximo, tienda sin elegibles vacía, artículo sin salida nunca elegido; verificar que todas pasan
 - [x] 3.4 Añadir prueba de determinismo (dos ejecuciones idénticas) y prueba de propiedades con 200 tiendas aleatorias con semilla fija que compruebe enteros, máximos, peso, volumen y densidad; verificar que pasan
+- [x] 3.5 Añadir el desempate por más BULTOS de salida en la tienda (tras "más líneas" y antes de "menor volumen"); verificar con la prueba "tres artículos de 1 línea con 12, 3 y 7 bultos y sitio para 1 caja → el de 12"
 
 ## 4. Verificación y escritura de la salida
 
@@ -38,6 +39,6 @@
 
 ## 6. Aceptación y documentación
 
-- [ ] 6.1 Ejecutar con los ficheros reales de ejemplo (`FICHERO_BASE_AR.xlsx` y `TABLA_DE_TIENDAS_Y_MEDIOS.xlsx`) y varios nº de días (1, 5, 20); verificar que la verificación pasa en las 180 tiendas y revisar a mano con el usuario 2 tiendas PALET y 2 CARRO (kg, L, densidad y reparto por líneas)
+- [x] 6.1 Ejecutar con los ficheros reales de ejemplo (`FICHERO_BASE_AR.xlsx` y `TABLA_DE_TIENDAS_Y_MEDIOS.xlsx`) y varios nº de días (1, 5, 20); verificar que la verificación pasa en las 180 tiendas y revisar a mano con el usuario 2 tiendas PALET y 2 CARRO (kg, L, densidad y reparto por líneas)
 - [x] 6.2 Escribir `README.md` en español con requisitos, instalación (`pip install -r requirements.txt`), uso (doble clic en `PRUEBAESTANDAR.pyw`), formato esperado de los ficheros y reglas de selección; verificar que una persona puede seguirlo desde cero
 - [x] 6.3 Ejecutar `pytest` completo y `graphify update .`; verificar que todas las pruebas pasan
