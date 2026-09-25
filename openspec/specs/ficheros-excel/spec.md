@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Leer y validar el FICHERO BASE y la TABLA DE TIENDAS Y MEDIOS de PRUEBAESTANDAR, y generar el fichero de salida PRUEBAESTANDAR.xlsx con las columnas ELECCIÓN rellenas sin alterar el resto del fichero base.
+Leer y validar el FICHERO BASE y la TABLA DE TIENDAS Y MEDIOS de PRUEBAESTANDAR, generar PRUEBAESTANDAR.xlsx con las columnas ELECCIÓN rellenas sin alterar el resto del fichero base, y generar REPARTOESTANDAR.xls con la elección en unidades para el programa de importación.
 
 ## Requirements
 

@@ -6,7 +6,7 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
 
-from . import escritura, proceso
+from . import proceso
 from .modelo import ErrorEscritura, ErrorValidacion
 from .seleccion import parsear_dias
 
@@ -86,12 +86,14 @@ class App:
             return
         try:
             dias = parsear_dias(self.var_dias.get())
-            destino = escritura.ruta_salida(self.ruta_base)
+            destinos = proceso.rutas_salida(self.ruta_base)
         except ErrorValidacion as exc:
             messagebox.showwarning("Dato no válido", str(exc))
             return
-        if destino.exists() and not messagebox.askyesno(
-            "Sobrescribir", f"Ya existe {destino}.\n¿Quieres sobrescribirlo?"
+        existentes = [d for d in destinos if d.exists()]
+        if existentes and not messagebox.askyesno(
+            "Sobrescribir",
+            "Ya existe:\n" + "\n".join(f"  {d}" for d in existentes) + "\n\n¿Quieres sobrescribir?",
         ):
             return
 
@@ -135,7 +137,9 @@ class App:
         if tipo == "ok":
             self._escribir_resumen(valor.texto())
             self.lbl_estado.configure(text="Proceso terminado.")
-            messagebox.showinfo("Proceso terminado", f"Se ha generado:\n{valor.ruta_salida}")
+            messagebox.showinfo(
+                "Proceso terminado", f"Se han generado:\n{valor.ruta_salida}\n{valor.ruta_reparto}"
+            )
         elif tipo == "escritura":
             self.lbl_estado.configure(text="No se pudo guardar el fichero.")
             if messagebox.askretrycancel("No se puede guardar", str(valor)):

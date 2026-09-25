@@ -9,8 +9,19 @@ from .conftest import articulo, fr, medio
 
 
 def test_seleccion_valida_sin_errores():
-    arts = [articulo(0, 400, 645), articulo(1, 400, 645)]  # 800 kg, 1290 L -> 0,620 kg/L
+    arts = [articulo(0, 400, 620), articulo(1, 400, 620)]  # 800 kg, 1240 L -> 0,645 kg/L
     assert errores_tienda(arts, fr([2, 2]), medio(), 1, {0: 1, 1: 1}) == []
+
+
+def test_detecta_volumen_por_encima_del_96_por_ciento():
+    arts = [articulo(0, 400, 645), articulo(1, 400, 645)]  # 1290 L > 1248 L
+    errores = errores_tienda(arts, fr([2, 2]), medio(), 1, {0: 1, 1: 1})
+    assert errores == ["volumen 1290.00 L supera el máximo 1248.00 L (96 %)"]
+
+
+def test_limites_exactos_del_96_por_ciento_son_validos():
+    arts = [articulo(0, 420, 624)]  # 2 cajas = 840 kg y 1248 L, densidad 0,673 < 0,6731
+    assert errores_tienda(arts, fr([2]), medio(densidad="0.6731"), 1, {0: 2}) == []
 
 
 def test_detecta_volumen_excedido_en_tienda_10082():
@@ -46,7 +57,7 @@ def test_detecta_cada_incumplimiento(seleccion, texto):
 def test_detecta_peso_excedido_con_carros():
     arts = [articulo(0, 500, 1000)]
     errores = errores_tienda(arts, fr([2]), medio("CARRO", 475, 600, densidad=10), 1, {0: 2})
-    assert any("peso 1000.00 kg supera el máximo 950.00" in e for e in errores)
+    assert any("peso 1000.00 kg supera el máximo 912.00" in e for e in errores)
 
 
 def test_tienda_sin_seleccion_es_valida():

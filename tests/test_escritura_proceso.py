@@ -130,6 +130,7 @@ def test_rendimiento_650x180(tmp_path):
     inicio = time.perf_counter()
     resumen = proceso.ejecutar(base, ruta_tabla, "5")
     duracion = time.perf_counter() - inicio
-    print(f"650x180: {duracion:.1f} s, {resumen.total_cajas} cajas")
+    print(f"650x180: {duracion:.1f} s, {resumen.total_cajas} cajas, {resumen.total_unidades} unidades")
     assert resumen.tiendas_procesadas == 180
+    assert resumen.ruta_salida.exists() and resumen.ruta_reparto.exists()
     assert duracion < 60

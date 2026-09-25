@@ -26,9 +26,10 @@ def escribir_elecciones(wb: Workbook, datos: DatosBase, selecciones: dict) -> No
             ws.cell(row=art.fila, column=demanda.col_eleccion).value = seleccion.get(i)
 
 
-def guardar(wb: Workbook, destino: Path) -> None:
+def guardar(libro, destino: Path) -> None:
+    """Guarda un libro de openpyxl o de xlwt (ambos tienen save(ruta))."""
     try:
-        wb.save(destino)
+        libro.save(str(destino))
     except PermissionError:
         raise ErrorEscritura(
             f"No se puede escribir {destino}. Si está abierto en Excel, ciérralo y pulsa Reintentar."

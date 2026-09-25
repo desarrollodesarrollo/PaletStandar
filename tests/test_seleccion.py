@@ -7,7 +7,7 @@ from pruebaestandar.modelo import ErrorValidacion
 from pruebaestandar.seleccion import maximo_cajas, parsear_dias, seleccionar
 from pruebaestandar.verificacion import errores_tienda
 
-from .conftest import articulo, fr, medio
+from .conftest import articulo, fr, medio, util
 
 HOLGADO = dict(peso=10_000, densidad=100)  # sólo limita el volumen
 
@@ -32,52 +32,52 @@ def test_maximo_cajas(bultos, dias, maximo):
 # 3.2
 def test_mas_lineas_mas_cajas():
     arts = [articulo(0, 10, 100), articulo(1, 10, 100)]
-    sel = seleccionar(arts, fr([5, 5]), fr([10, 4]), medio(volumen=300, **HOLGADO), dias=1)
+    sel = seleccionar(arts, fr([5, 5]), fr([10, 4]), medio(volumen=util(300), **HOLGADO), dias=1)
     assert sel == {0: 2, 1: 1}
 
 
 def test_reparto_proporcional_a_lineas():
     arts = [articulo(0, 1, 10), articulo(1, 1, 10), articulo(2, 1, 10)]
-    sel = seleccionar(arts, fr([50, 50, 50]), fr([12, 6, 3]), medio(volumen=70, **HOLGADO), dias=1)
+    sel = seleccionar(arts, fr([50, 50, 50]), fr([12, 6, 3]), medio(volumen=util(70), **HOLGADO), dias=1)
     assert sel == {0: 4, 1: 2, 2: 1}
 
 
 def test_empate_prefiere_articulo_nuevo():
     # A (10 líneas) con 1 caja -> índice 5; B (5 líneas) sin cajas -> índice 5: gana B por variedad
     arts = [articulo(0, 1, 10), articulo(1, 1, 10)]
-    sel = seleccionar(arts, fr([9, 9]), fr([10, 5]), medio(volumen=20, **HOLGADO), dias=1)
+    sel = seleccionar(arts, fr([9, 9]), fr([10, 5]), medio(volumen=util(20), **HOLGADO), dias=1)
     assert sel == {0: 1, 1: 1}
 
 
 def test_pocas_lineas_prefiere_mas_bultos():
     arts = [articulo(0, 1, 10), articulo(1, 1, 10), articulo(2, 1, 10)]
-    sel = seleccionar(arts, fr([12, 3, 7]), fr([1, 1, 1]), medio(volumen=10, **HOLGADO), dias=5)
+    sel = seleccionar(arts, fr([12, 3, 7]), fr([1, 1, 1]), medio(volumen=util(10), **HOLGADO), dias=5)
     assert sel == {0: 1}
 
 
 def test_mas_bultos_manda_sobre_menor_volumen():
     # dos artículos de 2 líneas: el de más salida gana aunque su caja sea más grande
     arts = [articulo(0, 1, 8), articulo(1, 1, 15)]
-    sel = seleccionar(arts, fr([2, 9]), fr([2, 2]), medio(volumen=16, **HOLGADO), dias=1)
+    sel = seleccionar(arts, fr([2, 9]), fr([2, 2]), medio(volumen=util(16), **HOLGADO), dias=1)
     assert sel == {1: 1}
 
 
 def test_mas_lineas_sigue_mandando_sobre_bultos():
     arts = [articulo(0, 1, 10), articulo(1, 1, 10)]
-    sel = seleccionar(arts, fr([1, 50]), fr([2, 1]), medio(volumen=10, **HOLGADO), dias=1)
+    sel = seleccionar(arts, fr([1, 50]), fr([2, 1]), medio(volumen=util(10), **HOLGADO), dias=1)
     assert sel == {0: 1}
 
 
 def test_empate_prefiere_menor_volumen_y_luego_menor_codigo():
     arts = [articulo(0, 1, 12, codigo=5), articulo(1, 1, 10, codigo=9), articulo(2, 1, 10, codigo=7)]
-    sel = seleccionar(arts, fr([1, 1, 1]), fr([3, 3, 3]), medio(volumen=10, **HOLGADO), dias=1)
+    sel = seleccionar(arts, fr([1, 1, 1]), fr([3, 3, 3]), medio(volumen=util(10), **HOLGADO), dias=1)
     assert sel == {2: 1}
 
 
 # 3.3
 def test_caja_que_no_cabe_no_bloquea_al_resto():
     arts = [articulo(0, 1, 30), articulo(1, 1, 30), articulo(2, 1, 12)]
-    sel = seleccionar(arts, fr([1, 1, 1]), fr([10, 9, 1]), medio(volumen=42, **HOLGADO), dias=1)
+    sel = seleccionar(arts, fr([1, 1, 1]), fr([10, 9, 1]), medio(volumen=util(42), **HOLGADO), dias=1)
     assert sel == {0: 1, 2: 1}
 
 
@@ -95,6 +95,18 @@ def test_seleccion_demasiado_densa_rechazada():
 def test_densidad_igual_al_limite_no_se_admite():
     arts = [articulo(0, 5, 10)]
     assert seleccionar(arts, fr([1]), fr([1]), medio(peso=100, volumen=200, densidad="0.5"), dias=1) == {}
+
+
+def test_palet_no_pasa_del_96_por_ciento_del_volumen():
+    # 13 cajas de 100 L llenaban el palet de 1300 L al 100 %; al 96 % (1248 L) sólo caben 12
+    arts = [articulo(0, 1, 100)]
+    assert seleccionar(arts, fr([13]), fr([5]), medio(), dias=1) == {0: 12}
+
+
+def test_carro_no_pasa_del_96_por_ciento_del_peso():
+    # 2 carros de 475 kg: 950 kg al 100 %, 912 kg al 96 % -> caben 9 cajas de 100 kg, no 9,5
+    arts = [articulo(0, 100, 1)]
+    assert seleccionar(arts, fr([10]), fr([5]), medio("CARRO", 475, 600, densidad=1000), dias=1) == {0: 9}
 
 
 def test_limite_de_peso_con_dos_carros():

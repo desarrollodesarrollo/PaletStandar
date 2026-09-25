@@ -90,9 +90,12 @@ def test_ejecucion_correcta_con_boton_desactivado(app, monkeypatch, ficheros_peq
     esperar(app)
     assert not app.btn_ejecutar.instate(["disabled"])
     assert (base.parent / "PRUEBAESTANDAR.xlsx").exists()
-    assert app.avisos[-1][0] == "showinfo" and "PRUEBAESTANDAR.xlsx" in app.avisos[-1][1]
+    assert (base.parent / "REPARTOESTANDAR.xls").exists()
+    assert app.avisos[-1][0] == "showinfo"
+    assert "PRUEBAESTANDAR.xlsx" in app.avisos[-1][1] and "REPARTOESTANDAR.xls" in app.avisos[-1][1]
     texto = app.txt_resumen.get("1.0", "end")
     assert "Tiendas procesadas: 2" in texto and "Total de cajas seleccionadas" in texto
+    assert "REPARTOESTANDAR.xls" in texto and "Total de unidades:" in texto
 
 
 def test_salida_existente_y_usuario_dice_no(app, monkeypatch, ficheros_pequenos):
@@ -104,6 +107,34 @@ def test_salida_existente_y_usuario_dice_no(app, monkeypatch, ficheros_pequenos)
     app.var_dias.set("2")
     app.ejecutar()
     assert not app.ocupado and existente.read_bytes() == b"previo"
+
+
+def test_solo_existe_el_reparto_y_usuario_dice_no(app, monkeypatch, ficheros_pequenos):
+    base, tabla = ficheros_pequenos
+    existente = base.parent / "REPARTOESTANDAR.xls"
+    existente.write_bytes(b"previo")
+    preguntas = []
+    monkeypatch.setattr(gui.messagebox, "askyesno", lambda titulo, texto: preguntas.append(texto) or False)
+    elegir(app, monkeypatch, base, tabla)
+    app.var_dias.set("2")
+    app.ejecutar()
+    assert len(preguntas) == 1 and "REPARTOESTANDAR.xls" in preguntas[0] and "PRUEBAESTANDAR.xlsx" not in preguntas[0]
+    assert not app.ocupado and existente.read_bytes() == b"previo"
+    assert not (base.parent / "PRUEBAESTANDAR.xlsx").exists()
+
+
+def test_existen_los_dos_una_sola_confirmacion(app, monkeypatch, ficheros_pequenos):
+    base, tabla = ficheros_pequenos
+    (base.parent / "PRUEBAESTANDAR.xlsx").write_bytes(b"previo")
+    (base.parent / "REPARTOESTANDAR.xls").write_bytes(b"previo")
+    preguntas = []
+    monkeypatch.setattr(gui.messagebox, "askyesno", lambda titulo, texto: preguntas.append(texto) or True)
+    elegir(app, monkeypatch, base, tabla)
+    app.var_dias.set("2")
+    app.ejecutar()
+    esperar(app)
+    assert len(preguntas) == 1 and "PRUEBAESTANDAR.xlsx" in preguntas[0] and "REPARTOESTANDAR.xls" in preguntas[0]
+    assert (base.parent / "REPARTOESTANDAR.xls").read_bytes()[:4] == bytes.fromhex("d0cf11e0")
 
 
 def test_salida_existente_y_usuario_dice_si(app, monkeypatch, ficheros_pequenos):

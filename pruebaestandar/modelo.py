@@ -5,6 +5,8 @@ from fractions import Fraction
 from pathlib import Path
 
 NOMBRE_SALIDA = "PRUEBAESTANDAR.xlsx"
+NOMBRE_REPARTO = "REPARTOESTANDAR.xls"
+LLENADO_MAXIMO = Fraction(96, 100)
 
 
 class ErrorValidacion(Exception):
@@ -22,6 +24,7 @@ class Articulo:
     peso: Fraction
     volumen: Fraction
     valido: bool
+    unidades_caja: int
 
 
 @dataclass(frozen=True)
@@ -37,11 +40,11 @@ class Medio:
 
     @property
     def peso_max(self) -> Fraction:
-        return self.n_medios * self.peso_unitario
+        return LLENADO_MAXIMO * self.n_medios * self.peso_unitario
 
     @property
     def volumen_max(self) -> Fraction:
-        return self.n_medios * self.volumen_unitario
+        return LLENADO_MAXIMO * self.n_medios * self.volumen_unitario
 
 
 @dataclass
@@ -62,17 +65,22 @@ class DatosBase:
 @dataclass
 class Resumen:
     ruta_salida: Path
+    ruta_reparto: Path
     tiendas_procesadas: int
     tiendas_sin_seleccion: int
     total_cajas: int
+    total_unidades: int
     avisos: list[str]
 
     def texto(self) -> str:
         lineas = [
-            f"Fichero generado: {self.ruta_salida}",
+            "Ficheros generados:",
+            f"  {self.ruta_salida}",
+            f"  {self.ruta_reparto}",
             f"Tiendas procesadas: {self.tiendas_procesadas}",
             f"Tiendas sin selección: {self.tiendas_sin_seleccion}",
             f"Total de cajas seleccionadas: {self.total_cajas}",
+            f"Total de unidades: {self.total_unidades}",
         ]
         if self.avisos:
             lineas.append(f"Avisos ({len(self.avisos)}):")

@@ -91,6 +91,12 @@ def extraer_datos_base(ws: Worksheet) -> DatosBase:
     def celda(fila, col):
         return fila[col - 1] if col - 1 < len(fila) else None
 
+    if _texto_normalizado(celda(fila2, 4)) != "UNIXCAJA":
+        raise ErrorValidacion(
+            f"Celda D2: la columna D del fichero base debe tener el encabezado 'UNIxCAJA' (unidades por caja) "
+            f"y tiene '{'' if celda(fila2, 4) is None else celda(fila2, 4)}'. ¿Es un fichero base antiguo?"
+        )
+
     bloques = []
     vistas = {}
     for col in range(PRIMERA_COL_TIENDA, ultima + 1, 3):
@@ -130,8 +136,22 @@ def extraer_datos_base(ws: Worksheet) -> DatosBase:
             avisos.append(
                 f"Artículo {codigo} (fila {n_fila}): peso o volumen vacío o no válido; no se seleccionará."
             )
+        valor_unidades = celda(fila, 4)
+        unidades = a_fraccion(valor_unidades)
+        if unidades is None or unidades.denominator != 1 or unidades < 1:
+            raise ErrorValidacion(
+                f"Fila {n_fila}, columna D (artículo {codigo}): UNIxCAJA debe ser un número entero mayor o igual "
+                f"que 1 y es '{'' if valor_unidades is None else valor_unidades}'."
+            )
         articulos.append(
-            Articulo(fila=n_fila, codigo=codigo, peso=peso or Fraction(0), volumen=volumen or Fraction(0), valido=valido)
+            Articulo(
+                fila=n_fila,
+                codigo=codigo,
+                peso=peso or Fraction(0),
+                volumen=volumen or Fraction(0),
+                valido=valido,
+                unidades_caja=int(unidades),
+            )
         )
         filas_datos.append((n_fila, fila))
 

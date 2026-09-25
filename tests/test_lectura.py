@@ -14,12 +14,12 @@ def hoja(ruta):
 
 
 # 2.1
-def test_medio_carro_duplica_capacidad():
+def test_medio_capacidad_al_96_por_ciento():
     carro = Medio("CARRO", Fraction(475), Fraction(600), Fraction(475, 600))
     palet = Medio("PALET", Fraction(875), Fraction(1300), Fraction(875, 1300))
-    assert (carro.n_medios, carro.peso_max, carro.volumen_max) == (2, 950, 1200)
-    assert (palet.n_medios, palet.peso_max, palet.volumen_max) == (1, 875, 1300)
-    assert carro.densidad == Fraction(475, 600)
+    assert (carro.n_medios, carro.peso_max, carro.volumen_max) == (2, 912, 1152)
+    assert (palet.n_medios, palet.peso_max, palet.volumen_max) == (1, 840, 1248)
+    assert carro.densidad == Fraction(475, 600) and palet.densidad == Fraction(875, 1300)
 
 
 # 2.2
@@ -112,6 +112,42 @@ def test_decimales_y_texto_numerico_admitidos(tmp_path):
     assert datos.tiendas[0].bultos[0] == Fraction(5, 2) and datos.tiendas[0].lineas[0] == 3
 
 
+def test_lee_unidades_por_caja(tmp_path):
+    ws = _base_2_tiendas(tmp_path)
+    ws["D3"], ws["D4"] = 18.0, "24"
+    datos = extraer_datos_base(ws)
+    assert [a.unidades_caja for a in datos.articulos] == [18, 24]
+    assert all(type(a.unidades_caja) is int for a in datos.articulos)
+
+
+@pytest.mark.parametrize("encabezado", ["Densidad (kg/l)", None, "UNIDADES"])
+def test_error_columna_d_no_es_unixcaja(tmp_path, encabezado):
+    ws = _base_2_tiendas(tmp_path)
+    ws["D2"] = encabezado
+    with pytest.raises(ErrorValidacion, match=r"Celda D2.*'UNIxCAJA'"):
+        extraer_datos_base(ws)
+
+
+def test_encabezado_unixcaja_sin_distinguir_mayusculas(tmp_path):
+    ws = _base_2_tiendas(tmp_path)
+    ws["D2"] = " unixcaja "
+    assert len(extraer_datos_base(ws).articulos) == 2
+
+
+@pytest.mark.parametrize("valor", [None, 0, -2, 2.5, "2,5", "abc"])
+def test_error_unixcaja_no_valido(tmp_path, valor):
+    ws = _base_2_tiendas(tmp_path)
+    ws["D4"] = valor
+    with pytest.raises(ErrorValidacion, match=r"Fila 4, columna D \(artículo 2\): UNIxCAJA"):
+        extraer_datos_base(ws)
+
+
+def test_fichero_base_nuevo_con_codigos_cortos(tmp_path):
+    ruta = crear_base(tmp_path / "b.xlsx", [(2101538, 9.54, 24.36, 18)], [(81, {0: (7, 2)}), (949, {0: (1, 1)})])
+    _, datos = leer_fichero_base(ruta)
+    assert [d.tienda for d in datos.tiendas] == [81, 949] and datos.articulos[0].unidades_caja == 18
+
+
 # 2.4
 @pytest.mark.parametrize("peso,volumen", [(5, 0), (0, 5), (None, 5), (5, "x"), (-1, 5)])
 def test_articulo_sin_peso_o_volumen_valido(tmp_path, peso, volumen):
@@ -127,7 +163,7 @@ def test_tabla_con_mas_tiendas(tmp_path):
     ruta = crear_tabla(tmp_path / "t.xlsx", [(1, *PALET), (10081, *PALET), (10082, *CARRO), (5, *CARRO)])
     medios = leer_tabla_medios(ruta, [10081, 10082])
     assert set(medios) == {10081, 10082}
-    assert medios[10082].tipo == "CARRO" and medios[10082].peso_max == 950
+    assert medios[10082].tipo == "CARRO" and medios[10082].peso_max == 912
 
 
 def test_tabla_tiendas_que_faltan(tmp_path):

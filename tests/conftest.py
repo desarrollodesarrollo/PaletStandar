@@ -7,25 +7,25 @@ from pathlib import Path
 import openpyxl
 import pytest
 
-from pruebaestandar.modelo import Articulo, Medio
+from pruebaestandar.modelo import LLENADO_MAXIMO, Articulo, Medio
 
 PALET = ("PALET", 875, 1300)
 CARRO = ("CARRO", 475, 600)
 
 
 def crear_base(ruta: Path, articulos, tiendas) -> Path:
-    """articulos: [(codigo, peso, volumen)]; tiendas: [(codigo, {indice_articulo: (bultos, lineas)})]."""
+    """articulos: [(codigo, peso, volumen[, unidades_caja])] (12 unidades por defecto);
+    tiendas: [(codigo, {indice_articulo: (bultos, lineas)})]."""
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Hoja1"
-    for c, h in enumerate(["CODIGO", "PESO (Kg)", "Volumen (L)", "Densidad (kg/l)"], start=1):
+    for c, h in enumerate(["CODIGO", "PESO (Kg)", "Volumen (L)", "UNIxCAJA"], start=1):
         ws.cell(2, c, h)
-    for i, (codigo, peso, volumen) in enumerate(articulos):
+    for i, (codigo, peso, volumen, *resto) in enumerate(articulos):
         ws.cell(3 + i, 1, codigo)
         ws.cell(3 + i, 2, peso)
         ws.cell(3 + i, 3, volumen)
-        if isinstance(peso, (int, float)) and isinstance(volumen, (int, float)) and volumen:
-            ws.cell(3 + i, 4, peso / volumen)
+        ws.cell(3 + i, 4, resto[0] if resto else 12)
     for t, (codigo, salidas) in enumerate(tiendas):
         col = 5 + 3 * t
         for k, h in enumerate(["BULTOS", "LINEAS", "ELECCIÓN"]):
@@ -59,7 +59,7 @@ def datos_aleatorios(n_articulos: int, n_tiendas: int, semilla: int):
     for i in range(n_articulos):
         volumen = round(rnd.uniform(4, 40), 3)
         peso = round(volumen * rnd.uniform(0.05, 0.97), 2)
-        articulos.append((2_000_000 + i, peso, volumen))
+        articulos.append((2_000_000 + i, peso, volumen, rnd.randint(1, 36)))
     tiendas, tabla = [], []
     for t in range(n_tiendas):
         codigo = 10_000 + t
@@ -74,7 +74,7 @@ def datos_aleatorios(n_articulos: int, n_tiendas: int, semilla: int):
     return articulos, tiendas, tabla
 
 
-def articulo(indice: int, peso, volumen, codigo=None) -> Articulo:
+def articulo(indice: int, peso, volumen, codigo=None, unidades_caja=1) -> Articulo:
     peso, volumen = Fraction(str(peso)), Fraction(str(volumen))
     return Articulo(
         fila=3 + indice,
@@ -82,7 +82,13 @@ def articulo(indice: int, peso, volumen, codigo=None) -> Articulo:
         peso=peso,
         volumen=volumen,
         valido=peso > 0 and volumen > 0,
+        unidades_caja=unidades_caja,
     )
+
+
+def util(capacidad):
+    """Valor de tabla cuyo 96 % es exactamente `capacidad` (para fijar la capacidad útil en las pruebas)."""
+    return Fraction(capacidad) / LLENADO_MAXIMO
 
 
 def medio(tipo="PALET", peso=875, volumen=1300, densidad=None) -> Medio:
@@ -97,7 +103,7 @@ def fr(valores):
 @pytest.fixture
 def ficheros_pequenos(tmp_path):
     """3 artículos × 2 tiendas (una PALET y una CARRO)."""
-    articulos = [(111, 5.0, 10.0), (222, 2.5, 8.0), (333, 7.2, 9.0)]
+    articulos = [(111, 5.0, 10.0, 6), (222, 2.5, 8.0, 12), (333, 7.2, 9.0, 1)]
     tiendas = [(10081, {0: (7, 3), 1: (2, 1)}), (10082, {0: (4, 2), 2: (9, 4)})]
     base = crear_base(tmp_path / "FICHERO_BASE.xlsx", articulos, tiendas)
     tabla = crear_tabla(tmp_path / "TABLA.xlsx", [(10081, *PALET), (10082, *CARRO), (99999, *PALET)])
