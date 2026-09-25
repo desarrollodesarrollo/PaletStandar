@@ -32,5 +32,5 @@
 
 - [x] 6.1 Ejecutar con `FICHERO_BASE_NUEVO.xlsx` y una tabla de tiendas con los códigos nuevos para 1, 5 y 20 días; verificar que las 180 tiendas pasan la comprobación, que el llenado máximo es ≤ 96 % y que REPARTOESTANDAR.xls = PRUEBAESTANDAR × UNIxCAJA en todas las celdas
 - [x] 6.2 Actualizar `README.md` (columna UNIxCAJA, margen del 96 %, REPARTOESTANDAR.xls, códigos de tienda que deben coincidir en los dos ficheros) y el `Purpose` de la spec principal `ficheros-excel` para mencionar REPARTOESTANDAR.xls; verificar leyendo ambos
-- [ ] 6.3 Ejecutar `pytest` completo, `graphify update .` y la compilación del `.exe` en GitHub Actions; verificar que todo pasa y entregar el enlace del nuevo zip
+- [x] 6.3 Ejecutar `pytest` completo, `graphify update .` y la compilación del `.exe` en GitHub Actions; verificar que todo pasa y entregar el enlace del nuevo zip
 - [ ] 6.4 Pedir al usuario que importe un REPARTOESTANDAR.xls real en su programa y confirme que lo acepta; verificar con su confirmación
