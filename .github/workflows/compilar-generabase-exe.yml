@@ -1,0 +1,52 @@
+name: Compilar GENERABASE.exe
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "generabase/**"
+      - "GENERABASE.pyw"
+      - "requirements-generabase.txt"
+      - "requirements-generabase-dev.txt"
+      - ".github/workflows/compilar-generabase-exe.yml"
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-generabase-dev.txt pyinstaller
+
+      - name: Pruebas
+        run: python -m pytest -q tests_generabase --ignore=tests_generabase/test_gui.py
+
+      - name: Compilar
+        run: pyinstaller --noconfirm --clean --onefile --windowed --name GENERABASE GENERABASE.pyw
+
+      - name: Comprobar que la ventana se abre
+        shell: pwsh
+        run: |
+          $proc = Start-Process -FilePath "dist\GENERABASE.exe" -PassThru
+          $abierta = $false
+          for ($i = 0; $i -lt 60 -and -not $abierta; $i++) {
+            Start-Sleep -Milliseconds 500
+            $abierta = [bool](Get-Process -Name GENERABASE -ErrorAction SilentlyContinue |
+              Where-Object { $_.MainWindowTitle -eq "GENERABASE" })
+          }
+          Get-Process -Name GENERABASE -ErrorAction SilentlyContinue | Stop-Process -Force
+          if (-not $abierta) { throw "La ventana GENERABASE no se ha abierto" }
+          Write-Host "Ventana GENERABASE abierta correctamente"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GENERABASE-windows
+          path: dist/GENERABASE.exe
+          retention-days: 90

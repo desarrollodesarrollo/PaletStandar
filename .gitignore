@@ -9,3 +9,7 @@ graphify-out/
 *.xlsx
 ~$*.xlsx
 !tests/**/*.xlsx
+
+# Bases de Access (GENERABASE): datos reales, no se suben
+*.accdb
+*.mdb
