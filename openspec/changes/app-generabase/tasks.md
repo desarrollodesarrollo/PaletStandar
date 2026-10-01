@@ -31,8 +31,8 @@
 
 ## 6. Ejecutable, aceptación y documentación
 
-- [ ] 6.1 Añadir `.github/workflows/compilar-generabase-exe.yml` (pruebas de GENERABASE, PyInstaller `GENERABASE.exe`, comprobación de la ventana, artefacto `GENERABASE-windows`) sin modificar `compilar-exe.yml`; verificar que la compilación en GitHub pasa y que no se lanza la de PRUEBAESTANDAR
-- [ ] 6.2 Aceptación con los ficheros de ejemplo (fuera del repo) y N = 1000: 7.808 filas en SALALM FILTRADO con las exclusiones de la spec, 124 tiendas, totales de control, lectura del Access idéntica a mdbtools y BULTOS/LINEAS de 5 artículos comprobados contra el CSV de mdbtools; verificar que todo cuadra y que tarda menos de 60 s
-- [ ] 6.3 Añadir al `README.md` una sección GENERABASE (entradas, salidas, reglas, totales de control, incompatibilidad actual con PRUEBAESTANDAR); verificar que las secciones de PRUEBAESTANDAR no cambian
-- [ ] 6.4 Ejecutar todas las pruebas (las de PRUEBAESTANDAR incluidas, que deben seguir en verde) y `graphify update .`; verificar que pasan
+- [x] 6.1 Añadir `.github/workflows/compilar-generabase-exe.yml` (pruebas de GENERABASE, PyInstaller `GENERABASE.exe`, comprobación de la ventana, artefacto `GENERABASE-windows`) sin modificar `compilar-exe.yml`; verificar que la compilación en GitHub pasa y que no se lanza la de PRUEBAESTANDAR
+- [x] 6.2 Aceptación con los ficheros de ejemplo (fuera del repo) y N = 1000: 7.808 filas en SALALM FILTRADO con las exclusiones de la spec, 124 tiendas, totales de control, lectura del Access idéntica a mdbtools y BULTOS/LINEAS de 5 artículos comprobados contra el CSV de mdbtools; verificar que todo cuadra y que tarda menos de 60 s
+- [x] 6.3 Añadir al `README.md` una sección GENERABASE (entradas, salidas, reglas, totales de control, incompatibilidad actual con PRUEBAESTANDAR); verificar que las secciones de PRUEBAESTANDAR no cambian
+- [x] 6.4 Ejecutar todas las pruebas (las de PRUEBAESTANDAR incluidas, que deben seguir en verde) y `graphify update .`; verificar que pasan
 - [ ] 6.5 Pedir al usuario que ejecute GENERABASE con el Access real (417 MB) y comunique el tiempo, si la memoria aguanta y si los totales de control coinciden con una consulta de totales en Access; verificar con su confirmación

@@ -91,3 +91,84 @@ Código en `pruebaestandar/`:
 - `gui.py`: ventana.
 
 La especificación vigente está en `openspec/specs/`.
+
+---
+
+# GENERABASE
+
+Aplicación independiente que **genera el FICHERO BASE** y un **SALALM FILTRADO** a partir de tres Excel y del Access de movimientos. Tiene su propio ejecutable, `GENERABASE.exe`. Se descarga como zip desde la pestaña **Actions**, en la ejecución «Compilar GENERABASE.exe» (apartado *Artifacts*). Si se usa con Python: `pip install -r requirements-generabase.txt` y doble clic en `GENERABASE.pyw`.
+
+> **Importante:** el FICHERO BASE de GENERABASE sigue la plantilla con la columna **TIPO** en la B. PRUEBAESTANDAR, tal como está hoy, espera UNIxCAJA en la columna D y **todavía no acepta** este fichero. Adaptarla será un cambio aparte.
+
+## Entradas
+
+| Fichero | Columnas que se usan (se buscan por nombre, en cualquier orden) |
+|---|---|
+| SALALM (.xlsx) | CODIGO, CAJAS, DESCRIPC, DESSEC, BAJA, UNIXCAJA, RADUBICA, PESO, VOLUMEN |
+| MAESTRO (.xlsx) | MAARTI, MACADU, MACLCA |
+| MAESTRO DE CADUCIDAD (.xlsx) | C3CADU, C3UTIL, C3COME |
+| MOVIMIENTOS (Access .accdb/.mdb, tabla `MOVIMIENTOS`) | MVARTI, MVTMOV, MVDESM, MVCANM, MVUNCA (y MVFECI, opcional, para el resumen) |
+
+Además se indica el **nº de artículos** del FICHERO BASE: un entero mayor que 0.
+
+El Access se lee **sin controladores de Microsoft**. En cada ejecución se comprueba que se han leído tantas filas como declara la tabla, y que todas las columnas tienen el mismo nº de valores. Si algo falla, no se genera nada.
+
+## Salidas (en la carpeta del fichero SALALM)
+
+### SALALM FILTRADO.xlsx
+Un artículo por fila, con estas columnas:
+- **CODIGO, DESCRIPCIÓN, CAJAS, UNIXCAJA:** se copian de SALALM.
+- **PESO:** PESO ÷ 1000, en kg por caja.
+- **VOLUMEN:** VOLUMEN ÷ 1000, en litros por caja.
+- **SECCIÓN:** se copia de SALALM.
+- **CADUCA y CADUCIDAD CODIGO:** MACADU y MACLCA del MAESTRO.
+- **CADUCIDAD y DESCRIPCIÓN CADUCIDAD:** C3UTIL y C3COME del MAESTRO DE CADUCIDAD.
+- **BAJAS:** se copia de SALALM.
+- **UBICACIÓN:** las 3 primeras cifras de RADUBICA.
+- **TIPO DE UBICACIÓN:** depende de la ubicación:
+  - menos de 220: ALIMENTACIÓN;
+  - de 220 a 290: ALTA ROTACIÓN;
+  - de 291 a 399: PASILLO ESTRECHO;
+  - de 400 a 599: BAZAR ABAJO;
+  - 600 o más: DROGUERÍA.
+
+**Se excluyen**, en este orden:
+1. Las secciones SUMINISTROS Y SERVICIOS y CAMPAÑA FIDELIDAD.
+2. Las bajas («B»).
+3. Los artículos sin ubicación (vacía o 000).
+4. PASILLO ESTRECHO y BAZAR ABAJO.
+5. Las caducidades **conocidas** menores de 92 días.
+
+Los artículos que no caducan, o que no están en el MAESTRO, se mantienen con la caducidad vacía. El fichero se ordena por CAJAS de mayor a menor.
+
+### FICHERO BASE.xlsx (hoja `TODOS`)
+- **Artículos:** los N primeros de SALALM FILTRADO, con CODIGO, TIPO, PESO (Kg), Volumen (L) y UNIxCAJA.
+- **Tiendas:** se usan los movimientos con MVTMOV = PI de las tiendas 10081–10349 y 10399–10999. A cada código se le resta 10000 y hay un bloque BULTOS / LINEAS / ELECCIÓN por tienda, en orden ascendente.
+- **Celdas de cada bloque:**
+  - BULTOS = suma de |MVCANM| ÷ MVUNCA;
+  - LINEAS = nº de movimientos;
+  - ELECCIÓN queda vacía.
+- Antes de guardar se comprueba que los totales de BULTOS y LINEAS cuadran con los movimientos.
+
+## Totales de control
+Al terminar, la ventana muestra lo que se ha leído del Access para que puedas compararlo con una consulta de totales en Access:
+- filas leídas y declaradas;
+- filas PI y filas PI en los rangos de tienda;
+- tiendas y artículos distintos;
+- suma de CAJAS y LINEAS;
+- fechas.
+
+También muestra cuántos artículos ha quitado cada regla y los avisos.
+
+## Desarrollo
+```
+pip install -r requirements-generabase-dev.txt
+python -m pytest tests_generabase
+```
+Código en `generabase/`:
+- `lectura.py`: los Excel.
+- `access.py`: el Access.
+- `salalm.py`: SALALM FILTRADO.
+- `fichero_base.py`: FICHERO BASE.
+- `proceso.py`: orquestación.
+- `gui.py`: ventana.
