@@ -8,7 +8,7 @@ Datos observados en los ficheros de ejemplo:
   - CAJAS puede tener decimales.
   - PESO está en gramos y VOLUMEN en cm³: el art. 273137, 6 botellas de vino, tiene PESO 8000 y VOLUMEN 12648.
   - RADUBICA es texto de 8 posiciones; 3.402 filas valen `"   00000"`.
-  - **DESCRIPC es igual a DESSEC en el 100 % de las filas.** Se copia tal cual, como pidió el usuario.
+  - DESCRIPC es igual a DESSEC en el 100 % de las filas. El usuario confirma que es intencionado, así que se copia tal cual.
 - **MAESTRO** (hoja `MSG001`, 22.621 filas): MAARTI es entero y único, y MAALMA vale siempre 1. MACADU es `S`/`N` y MACLCA va vacío si y sólo si MACADU = `N`. **4.886 artículos de SALALM no están en el MAESTRO.**
 - **MAESTRO DE CADUCIDAD** (hoja `MVG003`, 51 códigos): C3CADU es texto y único (`1`, `A`, `B02`, `K`…). Todo MACLCA del MAESTRO existe en C3CADU.
 - **Access** (`MOVIMIENTOS_CLAUDE.accdb`, ACE12 / Access 2007+, 22 MB):
@@ -110,14 +110,9 @@ Datos observados en los ficheros de ejemplo:
 
 - [Memoria con el Access real: unos 2 GB estimados, porque access-parser carga la tabla entera] → Se liberan las columnas que no se usan nada más leer. Se medirá con el Access real; si no cabe en el PC, se valorará ODBC o exportar la tabla.
 - [`access-parser` es joven (v0.0.6) y podría fallar con algún tipo de campo] → Comprobaciones de nº de filas y columnas en cada ejecución, totales de control visibles y verificación cruzada con mdbtools en la aceptación. MOVIMIENTOS sólo usa textos y números, que se leen bien.
-- [DESCRIPC no trae la descripción del artículo, sino la sección] → Se copia tal cual, según lo pedido, y queda anotado. Si existe otra columna con la descripción real, se cambia el origen en un momento.
 - [El FICHERO BASE no es compatible todavía con PRUEBAESTANDAR] → Decisión del usuario; queda documentado en el README y en el resumen de la ventana.
 - [1.812 artículos sin datos en el MAESTRO pasan el filtro sin caducidad] → Decisión del usuario; el resumen indica cuántos son.
 
 ## Migration Plan
 
 App nueva: se descarga el zip `GENERABASE-windows` desde GitHub Actions y se usa igual que PRUEBAESTANDAR. Para volver atrás basta con no usarla; PRUEBAESTANDAR no cambia.
-
-## Open Questions
-
-- Si en el futuro hay otra columna con la descripción real del artículo, ¿se usa en lugar de DESCRIPC? No cambia la arquitectura, solo de qué columna se copia el dato.
