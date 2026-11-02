@@ -12,11 +12,11 @@ Para cada artículo y tienda:
 Un artículo de los N sin ningún movimiento en ninguna tienda SHALL aparecer igualmente, con todas las celdas de tienda vacías.
 
 #### Scenario: Suma y recuento
-- **WHEN** el artículo 2465665 tiene en la tienda 389 dos movimientos de 16 y 8 unidades con MVUNCA 16, de fechas distintas
-- **THEN** en el bloque de la tienda 389 su BULTOS es 1,5 y su LINEAS es 2
+- **WHEN** el artículo 2465665 tiene en la tienda 400 dos movimientos de 16 y 8 unidades con MVUNCA 16, de fechas distintas
+- **THEN** en el bloque de la tienda 400 su BULTOS es 1,5 y su LINEAS es 2
 
 #### Scenario: Varios movimientos el mismo día
-- **WHEN** el artículo 2465665 tiene en la tienda 389 tres movimientos de 16 unidades con MVUNCA 16, dos del 01/10/2025 y uno del 03/10/2025
+- **WHEN** el artículo 2465665 tiene en la tienda 400 tres movimientos de 16 unidades con MVUNCA 16, dos del 01/10/2025 y uno del 03/10/2025
 - **THEN** su BULTOS es 3 y su LINEAS es 2
 
 #### Scenario: Sin movimientos en una tienda

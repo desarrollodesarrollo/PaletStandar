@@ -12,8 +12,7 @@ from .columnas import entero, normalizar, numero, texto
 from .modelo import ErrorValidacion
 
 TABLA = "MOVIMIENTOS"
-COLUMNAS = ("MVARTI", "MVTMOV", "MVDESM", "MVCANM", "MVUNCA")
-OPCIONAL_FECHA = "MVFECI"
+COLUMNAS = ("MVARTI", "MVTMOV", "MVDESM", "MVCANM", "MVUNCA", "MVFECI")
 RANGOS_TIENDA = ((10081, 10349), (10399, 10999))
 DESPLAZAMIENTO_TIENDA = 10000
 
@@ -27,7 +26,7 @@ class Movimientos:
 
 @dataclass
 class MovimientosUsados:
-    lineas: list[tuple[int, int, float]]  # (artículo, tienda sin 10000, cajas)
+    lineas: list[tuple[int, int, float, int]]  # (artículo, tienda sin 10000, cajas, fecha AAAAMMDD)
     filas_leidas: int
     filas_declaradas: int
     filas_pi: int = 0
@@ -35,21 +34,31 @@ class MovimientosUsados:
     sin_unidades_caja: int = 0
     articulo_no_valido: int = 0
     tienda_no_valida: int = 0
-    fecha_min: int | None = None
-    fecha_max: int | None = None
     avisos: list[str] = field(default_factory=list)
 
     @property
     def tiendas(self) -> list[int]:
-        return sorted({t for _, t, _ in self.lineas})
+        return sorted({t for _, t, _, _ in self.lineas})
 
     @property
     def articulos(self) -> int:
-        return len({a for a, _, _ in self.lineas})
+        return len({a for a, _, _, _ in self.lineas})
 
     @property
     def total_cajas(self) -> float:
-        return math.fsum(c for _, _, c in self.lineas)
+        return math.fsum(c for _, _, c, _ in self.lineas)
+
+    @property
+    def dias(self) -> int:
+        return len({f for _, _, _, f in self.lineas})
+
+    @property
+    def fecha_min(self) -> int | None:
+        return min((f for _, _, _, f in self.lineas), default=None)
+
+    @property
+    def fecha_max(self) -> int | None:
+        return max((f for _, _, _, f in self.lineas), default=None)
 
 
 def _tablas_de_usuario(db) -> list[str]:
@@ -97,8 +106,7 @@ def leer_movimientos(ruta: Path) -> Movimientos:
             "por el Access. No se ha generado ningún fichero.".replace(",", ".")
         )
 
-    conservar = list(COLUMNAS) + ([OPCIONAL_FECHA] if OPCIONAL_FECHA in por_nombre else [])
-    columnas = {c: datos[por_nombre[c]] for c in conservar}
+    columnas = {c: datos[por_nombre[c]] for c in COLUMNAS}
     datos.clear()
     return Movimientos(columnas=columnas, filas_leidas=leidas, filas_declaradas=declaradas)
 
@@ -111,7 +119,6 @@ def filtrar(movimientos: Movimientos) -> MovimientosUsados:
     """Sólo PI de las tiendas en rango; CAJAS = |MVCANM| / MVUNCA."""
     c = movimientos.columnas
     usados = MovimientosUsados(lineas=[], filas_leidas=movimientos.filas_leidas, filas_declaradas=movimientos.filas_declaradas)
-    fechas = c.get(OPCIONAL_FECHA)
     for i in range(movimientos.filas_leidas):
         if normalizar(c["MVTMOV"][i]) != "PI":
             continue
@@ -139,12 +146,13 @@ def filtrar(movimientos: Movimientos) -> MovimientosUsados:
         if unidades is None or numero(unidades) <= 0:
             usados.sin_unidades_caja += 1
             continue
-        usados.lineas.append((articulo, tienda - DESPLAZAMIENTO_TIENDA, abs(numero(cantidad)) / numero(unidades)))
-        if fechas is not None:
-            fecha = entero(fechas[i])
-            if fecha is not None:
-                usados.fecha_min = fecha if usados.fecha_min is None else min(usados.fecha_min, fecha)
-                usados.fecha_max = fecha if usados.fecha_max is None else max(usados.fecha_max, fecha)
+        fecha = entero(c["MVFECI"][i])
+        if fecha is None or fecha <= 0:
+            raise ErrorValidacion(
+                f"Tabla {TABLA}, fila {i + 1}: MVFECI '{texto(c['MVFECI'][i])}' no es una fecha válida (AAAAMMDD) "
+                f"(artículo {articulo}, tienda {tienda}). No se ha generado ningún fichero."
+            )
+        usados.lineas.append((articulo, tienda - DESPLAZAMIENTO_TIENDA, abs(numero(cantidad)) / numero(unidades), fecha))
 
     for n, motivo in (
         (usados.tienda_no_valida, "con código de tienda (MVDESM) no numérico"),

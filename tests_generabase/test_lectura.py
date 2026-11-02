@@ -152,7 +152,7 @@ def test_filtro_de_tipo_y_rangos_de_tienda(tmp_path, falso_access):
 
 def test_cajas_valor_absoluto_entre_unidades(tmp_path, falso_access):
     usados = access.filtrar(access.leer_movimientos(crear_access(tmp_path / "a.accdb", [mov(7, 10081, 18, 12)])))
-    assert usados.lineas == [(7, 81, 1.5)] and usados.total_cajas == 1.5
+    assert usados.lineas == [(7, 81, 1.5, 20251015)] and usados.total_cajas == 1.5
 
 
 def test_movimientos_no_validos_se_cuentan(tmp_path, falso_access):
@@ -174,3 +174,29 @@ def test_totales_de_control_y_fechas(tmp_path, falso_access):
     usados = access.filtrar(access.leer_movimientos(crear_access(tmp_path / "a.accdb", movs)))
     assert (usados.articulos, usados.tiendas, usados.total_cajas) == (2, [81, 82], 3.5)
     assert (usados.fecha_min, usados.fecha_max) == (20251001, 20251020)
+    assert usados.dias == 3
+
+
+def test_access_sin_columna_mvfeci(tmp_path, falso_access):
+    ruta = crear_access(tmp_path / "a.accdb", [mov(1, 10081, 6, 6)], quitar=("MVFECI",))
+    with pytest.raises(ErrorValidacion, match="Falta la columna MVFECI en la tabla MOVIMIENTOS del Access"):
+        access.leer_movimientos(ruta)
+
+
+@pytest.mark.parametrize("fecha", [None, "", "abc", 0])
+def test_movimiento_usado_sin_fecha_detiene(tmp_path, falso_access, fecha):
+    movs = [mov(1, 10081, 6, 6), mov(5, 10400, 6, 6, fecha=fecha)]
+    with pytest.raises(ErrorValidacion, match=r"fila 2: MVFECI .* no es una fecha válida .*artículo 5, tienda 10400"):
+        access.filtrar(access.leer_movimientos(crear_access(tmp_path / "a.accdb", movs)))
+
+
+def test_movimiento_no_usado_sin_fecha_no_afecta(tmp_path, falso_access):
+    movs = [mov(1, 10081, 6, 6), mov(2, 10081, 6, 6, tipo="SI", fecha=None), mov(3, 10378, 6, 6, fecha=None), mov(4, 10081, 6, 0, fecha=None)]
+    usados = access.filtrar(access.leer_movimientos(crear_access(tmp_path / "a.accdb", movs)))
+    assert usados.lineas == [(1, 81, 1.0, 20251015)] and usados.dias == 1
+
+
+def test_dias_distintos_del_conjunto(tmp_path, falso_access):
+    movs = [mov(1, 10081, 6, 6, fecha=20251001), mov(1, 10081, 6, 6, fecha=20251001), mov(2, 10082, 6, 6, fecha=20251003)]
+    usados = access.filtrar(access.leer_movimientos(crear_access(tmp_path / "a.accdb", movs)))
+    assert (usados.dias, usados.fecha_min, usados.fecha_max, len(usados.lineas)) == (2, 20251001, 20251003, 3)

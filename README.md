@@ -107,9 +107,11 @@ Aplicación independiente que **genera el FICHERO BASE** y un **SALALM FILTRADO*
 | SALALM (.xlsx) | CODIGO, CAJAS, DESCRIPC, DESSEC, BAJA, UNIXCAJA, RADUBICA, PESO, VOLUMEN |
 | MAESTRO (.xlsx) | MAARTI, MACADU, MACLCA |
 | MAESTRO DE CADUCIDAD (.xlsx) | C3CADU, C3UTIL, C3COME |
-| MOVIMIENTOS (Access .accdb/.mdb, tabla `MOVIMIENTOS`) | MVARTI, MVTMOV, MVDESM, MVCANM, MVUNCA (y MVFECI, opcional, para el resumen) |
+| MOVIMIENTOS (Access .accdb/.mdb, tabla `MOVIMIENTOS`) | MVARTI, MVTMOV, MVDESM, MVCANM, MVUNCA, MVFECI |
 
 Además se indica el **nº de artículos** del FICHERO BASE: un entero mayor que 0.
+
+MVFECI es obligatoria: si un movimiento PI de las tiendas en rango no tiene una fecha válida, el programa se detiene indicando la fila.
 
 El Access se lee **sin controladores de Microsoft**. En cada ejecución se comprueba que se han leído tantas filas como declara la tabla, y que todas las columnas tienen el mismo nº de valores. Si algo falla, no se genera nada.
 
@@ -146,7 +148,7 @@ Los artículos que no caducan, o que no están en el MAESTRO, se mantienen con l
 - **Tiendas:** se usan los movimientos con MVTMOV = PI de las tiendas 10081–10349 y 10399–10999. A cada código se le resta 10000 y hay un bloque BULTOS / LINEAS / ELECCIÓN por tienda, en orden ascendente.
 - **Celdas de cada bloque:**
   - BULTOS = suma de |MVCANM| ÷ MVUNCA;
-  - LINEAS = nº de movimientos;
+  - LINEAS = nº de **días distintos** (valores distintos de MVFECI) en que la tienda ha pedido el artículo; varios movimientos del mismo día cuentan como 1;
   - ELECCIÓN queda vacía.
 - Antes de guardar se comprueba que los totales de BULTOS y LINEAS cuadran con los movimientos.
 
@@ -155,7 +157,8 @@ Al terminar, la ventana muestra lo que se ha leído del Access para que puedas c
 - filas leídas y declaradas;
 - filas PI y filas PI en los rangos de tienda;
 - tiendas y artículos distintos;
-- suma de CAJAS y LINEAS;
+- suma de CAJAS y LINEAS (nº de movimientos usados);
+- días distintos (MVFECI) y fechas mínima y máxima;
 - fechas.
 
 También muestra cuántos artículos ha quitado cada regla y los avisos.

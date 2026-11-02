@@ -37,13 +37,17 @@ def seleccionar(filas: list[FilaSalalm], n: int) -> tuple[list[FilaSalalm], str 
 
 
 def agregar(articulos: list[FilaSalalm], usados: MovimientosUsados) -> tuple[list[int], dict[tuple[int, int], tuple[float, int]]]:
-    """Tiendas (todas las de los movimientos usados, ascendentes) y {(artículo, tienda): (bultos, líneas)}."""
+    """Tiendas (todas las de los movimientos usados, ascendentes) y {(artículo, tienda): (bultos, líneas)}.
+
+    BULTOS suma las cajas de todos los movimientos; LINEAS cuenta las fechas (MVFECI) distintas.
+    """
     codigos = {a.codigo for a in articulos}
-    cajas = defaultdict(list)
-    for articulo, tienda, c in usados.lineas:
+    cajas, fechas = defaultdict(list), defaultdict(set)
+    for articulo, tienda, c, fecha in usados.lineas:
         if articulo in codigos:
             cajas[(articulo, tienda)].append(c)
-    return usados.tiendas, {k: (math.fsum(v), len(v)) for k, v in cajas.items()}
+            fechas[(articulo, tienda)].add(fecha)
+    return usados.tiendas, {k: (math.fsum(v), len(fechas[k])) for k, v in cajas.items()}
 
 
 def _numero(v):
@@ -77,8 +81,8 @@ def construir_libro(articulos: list[FilaSalalm], tiendas: list[int], agregado: d
 def verificar_totales(libro: Workbook, articulos: list[FilaSalalm], usados: MovimientosUsados) -> tuple[float, int]:
     """Recalcula desde los movimientos los totales esperados y los compara con lo escrito en la hoja."""
     codigos = {a.codigo for a in articulos}
-    esperado_bultos = math.fsum(c for a, _, c in usados.lineas if a in codigos)
-    esperado_lineas = sum(1 for a, _, _ in usados.lineas if a in codigos)
+    esperado_bultos = math.fsum(c for a, _, c, _ in usados.lineas if a in codigos)
+    esperado_lineas = len({(a, t, f) for a, t, _, f in usados.lineas if a in codigos})
     hoja = libro[HOJA]
     bultos, lineas = [], 0
     for fila in hoja.iter_rows(min_row=3, min_col=PRIMERA_COL_TIENDA, values_only=True):

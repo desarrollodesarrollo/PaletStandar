@@ -57,10 +57,10 @@ class Resumen:
             f"  Filas PI: {_miles(m.filas_pi)}  ·  PI en rangos de tienda: {_miles(m.filas_en_rango)}  ·  usadas: {_miles(len(m.lineas))}",
             f"  Tiendas: {_miles(len(m.tiendas))}  ·  artículos distintos: {_miles(m.articulos)}",
             f"  Suma de CAJAS: {_es(m.total_cajas, 2)}  ·  LINEAS: {_miles(len(m.lineas))}",
+            f"  Días distintos (MVFECI): {_miles(m.dias)}  ·  fechas: "
+            + (f"{_fecha(m.fecha_min)} – {_fecha(m.fecha_max)}" if m.fecha_min is not None else "—"),
+            "",
         ]
-        if m.fecha_min is not None:
-            lineas.append(f"  Fechas (MVFECI): {_fecha(m.fecha_min)} – {_fecha(m.fecha_max)}")
-        lineas.append("")
         if self.avisos:
             lineas.append(f"Avisos ({len(self.avisos)}):")
             lineas.extend(f"  - {a}" for a in self.avisos[:200])

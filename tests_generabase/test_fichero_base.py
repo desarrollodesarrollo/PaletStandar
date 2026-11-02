@@ -16,7 +16,9 @@ def filas(*especificacion):
 
 
 def usados(lineas):
-    return MovimientosUsados(lineas=list(lineas), filas_leidas=len(lineas), filas_declaradas=len(lineas))
+    """Movimientos (artículo, tienda, cajas[, fecha]); sin fecha, cada uno recibe un día distinto."""
+    con_fecha = [m if len(m) == 4 else (*m, 20251001 + i) for i, m in enumerate(lineas)]
+    return MovimientosUsados(lineas=con_fecha, filas_leidas=len(con_fecha), filas_declaradas=len(con_fecha))
 
 
 # 4.1
@@ -37,9 +39,23 @@ def test_top_n_y_n_mayor_que_el_total():
 # 4.2
 def test_bultos_y_lineas_por_articulo_y_tienda():
     elegidos = filas((2465665, 10))
-    tiendas, agregado = fichero_base.agregar(elegidos, usados([(2465665, 389, 16 / 16), (2465665, 389, 8 / 16), (2465665, 81, 2.0)]))
-    assert tiendas == [81, 389]
-    assert agregado == {(2465665, 389): (1.5, 2), (2465665, 81): (2.0, 1)}
+    tiendas, agregado = fichero_base.agregar(elegidos, usados([(2465665, 400, 16 / 16), (2465665, 400, 8 / 16), (2465665, 81, 2.0)]))
+    assert tiendas == [81, 400]
+    assert agregado == {(2465665, 400): (1.5, 2), (2465665, 81): (2.0, 1)}
+
+
+def test_lineas_cuenta_dias_distintos():
+    elegidos = filas((2465665, 10))
+    mov = usados([(2465665, 400, 1.0, 20251001), (2465665, 400, 1.0, 20251001), (2465665, 400, 1.0, 20251003)])
+    _, agregado = fichero_base.agregar(elegidos, mov)
+    assert agregado == {(2465665, 400): (3.0, 2)}
+
+
+def test_mismo_dia_en_tiendas_distintas_cuenta_en_cada_una():
+    elegidos = filas((1, 10), (2, 5))
+    mov = usados([(1, 81, 1.0, 20251001), (1, 82, 1.0, 20251001), (2, 81, 1.0, 20251001), (1, 81, 1.0, 20251001)])
+    _, agregado = fichero_base.agregar(elegidos, mov)
+    assert agregado == {(1, 81): (2.0, 1), (1, 82): (1.0, 1), (2, 81): (1.0, 1)}
 
 
 def test_tiendas_de_todos_los_movimientos_aunque_no_sean_de_los_n():
@@ -80,4 +96,15 @@ def test_agregacion_manipulada_no_pasa_la_comprobacion():
         fichero_base.verificar_totales(libro, elegidos, mov)
     agregado[(10, 81)] = (1.4, 2)
     with pytest.raises(ErrorValidacion, match="BULTOS escritos 1.400 frente a 1.500"):
+        fichero_base.verificar_totales(fichero_base.construir_libro(elegidos, tiendas, agregado), elegidos, mov)
+
+
+def test_comprobacion_rechaza_lineas_contadas_por_movimientos():
+    elegidos = filas((10, 80))
+    mov = usados([(10, 81, 1.0, 20251001), (10, 81, 0.5, 20251001), (10, 81, 0.5, 20251002)])
+    tiendas, agregado = fichero_base.agregar(elegidos, mov)
+    libro = fichero_base.construir_libro(elegidos, tiendas, agregado)
+    assert fichero_base.verificar_totales(libro, elegidos, mov) == (2.0, 2)
+    agregado[(10, 81)] = (2.0, 3)  # criterio antiguo: nº de movimientos
+    with pytest.raises(ErrorValidacion, match="LINEAS escritas 3 frente a 2"):
         fichero_base.verificar_totales(fichero_base.construir_libro(elegidos, tiendas, agregado), elegidos, mov)

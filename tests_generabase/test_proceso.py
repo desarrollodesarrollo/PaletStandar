@@ -23,14 +23,15 @@ def test_extremo_a_extremo(entradas):
     assert [wb.cell(1, c).value for c in range(6, wb.max_column + 1, 3)] == [81, 349, 400, 500, 999]
     assert [wb.cell(r, 1).value for r in (3, 4)] == [102, 101] and wb.max_row == 4
     assert [wb.cell(3, c).value for c in (2, 3, 4, 5)] == ["ALTA ROTACIÓN", 8, 12.648, 6]
-    assert [wb.cell(4, c).value for c in range(6, 12)] == [3, 2, None, None, None, None]  # 101 en 81: 2+1 cajas, 2 líneas
+    assert [wb.cell(4, c).value for c in range(6, 12)] == [3, 1, None, None, None, None]  # 101 en 81: 2+1 cajas, 1 día
     assert [wb.cell(4, c).value for c in range(12, 15)] == [1.5, 1, None]  # 101 en 400
     assert [wb.cell(3, c).value for c in range(9, 12)] == [1, 1, None]  # 102 en 349
-    assert (resumen.articulos_base, resumen.tiendas_base, resumen.bultos_base, resumen.lineas_base) == (2, 5, 5.5, 4)
+    assert (resumen.articulos_base, resumen.tiendas_base, resumen.bultos_base, resumen.lineas_base) == (2, 5, 5.5, 3)
 
     texto = resumen.texto()
     for esperado in ("SALALM FILTRADO: 3 artículos de 8", "FICHERO BASE: 2 artículos × 5 tiendas", "Filas leídas / declaradas: 8 / 8",
-                     "Filas PI: 7", "PI en rangos de tienda: 6", "Suma de CAJAS: 7,50", "Fechas (MVFECI): 15/10/2025"):
+                     "Filas PI: 7", "PI en rangos de tienda: 6", "Suma de CAJAS: 7,50", "LINEAS: 6",
+                     "Días distintos (MVFECI): 1  ·  fechas: 15/10/2025 – 15/10/2025"):
         assert esperado in texto, esperado
 
 

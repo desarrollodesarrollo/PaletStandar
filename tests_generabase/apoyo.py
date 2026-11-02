@@ -49,7 +49,8 @@ CADUCIDADES = [("K", 92, "ARTICULOS DE 3 MESES"), ("J02", 85, "ARTICULOS DE 80 D
 
 def mov(arti, tienda, cantidad, unidades, tipo="PI", fecha=20251015):
     return dict(MVARTI=str(arti), MVTMOV=tipo, MVDESM=f"{tienda:09d}" if isinstance(tienda, int) else tienda,
-                MVCANM=float(-cantidad), MVUNCA=None if unidades is None else float(unidades), MVFECI=float(fecha))
+                MVCANM=float(-cantidad), MVUNCA=None if unidades is None else float(unidades),
+                MVFECI=fecha if fecha is None or isinstance(fecha, str) else float(fecha))
 
 
 def crear_access(ruta: Path, movimientos: list[dict], declaradas=None, tabla="MOVIMIENTOS", con_id=True, quitar=()) -> Path:

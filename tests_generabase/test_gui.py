@@ -79,6 +79,7 @@ def test_ejecucion_correcta(app, monkeypatch, entradas):
     assert tipo == "showinfo" and "SALALM FILTRADO.xlsx" in texto and "FICHERO BASE.xlsx" in texto
     resumen = app.txt_resumen.get("1.0", "end")
     assert "Totales de control del Access" in resumen and "Filas leídas / declaradas: 8 / 8" in resumen
+    assert "LINEAS: 6" in resumen and "Días distintos (MVFECI): 1" in resumen
     assert app.lbl_estado.cget("text") == "Proceso terminado."
 
 

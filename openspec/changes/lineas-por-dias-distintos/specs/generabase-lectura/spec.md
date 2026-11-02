@@ -43,7 +43,7 @@ Si alguna comprobación falla, el sistema MUST detenerse sin generar ficheros y 
 - **THEN** el sistema se detiene con un error que muestra las dos cifras y no genera ningún fichero
 
 #### Scenario: Movimiento usado sin fecha
-- **WHEN** un movimiento PI de la tienda 10389 tiene MVFECI vacío
+- **WHEN** un movimiento PI de la tienda 10400 (dentro de los rangos) tiene MVFECI vacío
 - **THEN** el sistema se detiene con un error que indica la fila del Access y que MVFECI no es una fecha válida, y no genera ningún fichero
 
 #### Scenario: Movimiento no usado sin fecha
