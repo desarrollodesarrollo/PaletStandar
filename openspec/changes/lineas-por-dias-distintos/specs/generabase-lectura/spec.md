@@ -58,9 +58,9 @@ Al terminar, el sistema SHALL mostrar los totales de lo leído del Access, para 
 - nº de tiendas;
 - nº de artículos distintos;
 - suma de CAJAS (|MVCANM| ÷ MVUNCA);
-- nº de movimientos usados;
+- nº total de LINEAS (movimientos usados, es decir, filas del Access que se usan);
 - nº de días distintos (valores distintos de MVFECI) y la fecha mínima y máxima de los movimientos usados.
 
 #### Scenario: Totales de la copia de ejemplo
 - **WHEN** se procesa la copia de ejemplo
-- **THEN** el resumen muestra 52.150 filas leídas y declaradas, 51.835 filas PI, 38.947 dentro de rangos, 124 tiendas, 38.947 movimientos usados y 1 día distinto (15/10/2025)
+- **THEN** el resumen muestra 52.150 filas leídas y declaradas, 51.835 filas PI, 38.947 dentro de rangos, 124 tiendas, 38.947 LINEAS y 1 día distinto (15/10/2025)

@@ -10,7 +10,7 @@ En el FICHERO BASE que genera GENERABASE, la columna LINEAS de cada tienda cuent
 - **BULTOS no cambia:** sigue siendo la suma de |MVCANM| ÷ MVUNCA de todos los movimientos.
 - **MVFECI pasa a ser columna obligatoria** del Access. Si falta, el proceso se detiene indicándolo. Si un movimiento usado tiene MVFECI vacío o no numérico, también se detiene, con la fila del Access, para no calcular LINEAS a medias.
 - **Comprobación previa al guardado:** la suma de LINEAS se recalcula como la suma, por artículo y tienda, de sus días distintos.
-- **Totales de control:** «LINEAS» pasa a llamarse «Movimientos usados», porque sigue contando filas, y se añade el nº de días distintos del periodo, para compararlo con Access. La fecha mínima y máxima se muestran siempre.
+- **Totales de control:** se mantiene el nombre «LINEAS», que sigue mostrando el nº de movimientos usados (filas del Access), como hasta ahora. Se añade el nº de días distintos del periodo para compararlo con Access, y la fecha mínima y máxima se muestran siempre.
 - PRUEBAESTANDAR no cambia. Cuando se adapte para leer este FICHERO BASE, recibirá LINEAS con el nuevo significado (días con pedido).
 
 ## Capabilities
@@ -20,7 +20,7 @@ En el FICHERO BASE que genera GENERABASE, la columna LINEAS de cada tienda cuent
 
 ### Modified Capabilities
 - `generabase-fichero-base`: LINEAS cuenta días distintos (MVFECI) por artículo y tienda, y la comprobación de totales usa ese criterio.
-- `generabase-lectura`: MVFECI pasa a ser columna obligatoria del Access y se valida en los movimientos usados. Los totales de control muestran movimientos usados y días distintos.
+- `generabase-lectura`: MVFECI pasa a ser columna obligatoria del Access y se valida en los movimientos usados. Los totales de control añaden los días distintos (LINEAS conserva su nombre).
 
 ## Impact
 

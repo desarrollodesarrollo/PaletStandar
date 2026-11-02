@@ -48,7 +48,7 @@ La firma y el formato de salida (`{(a, t): (bultos, lineas)}`) no cambian, así 
 `verificar_totales()` recalcula las LINEAS esperadas desde `usados.lineas` con un conjunto de `(artículo, tienda, fecha)` de los N artículos: su tamaño es la suma esperada. Se compara con la suma de las celdas LINEAS escritas, que se leen de la hoja como hoy.
 
 ### 5. Resumen
-- En los totales de control, «LINEAS: n» pasa a «Movimientos usados: n» y se añade «Días distintos: d» junto a las fechas, que se muestran siempre.
+- En los totales de control se mantiene «LINEAS: n» (nº de movimientos usados, como hoy), por decisión del usuario, y se añade «Días distintos: d» junto a las fechas, que se muestran siempre.
 - La línea del FICHERO BASE sigue diciendo «… bultos y … líneas», con la nueva suma.
 
 ## Risks / Trade-offs
