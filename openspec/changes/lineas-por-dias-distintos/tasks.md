@@ -14,5 +14,5 @@
 
 - [x] 3.1 En `generabase/proceso.py`, mantener la etiqueta «LINEAS» en los totales de control y añadir «Días distintos» junto a las fechas (siempre visibles); verificar con la prueba de extremo a extremo y la de la ventana
 - [x] 3.2 Actualizar la sección GENERABASE del `README.md` (LINEAS = días distintos por artículo y tienda, MVFECI obligatoria); verificar que la parte de PRUEBAESTANDAR no cambia
-- [ ] 3.3 Ejecutar todas las pruebas (PRUEBAESTANDAR incluidas), `graphify update .` y la compilación del `.exe` de GENERABASE; verificar que pasan y que no se compila PRUEBAESTANDAR
+- [x] 3.3 Ejecutar todas las pruebas (PRUEBAESTANDAR incluidas), `graphify update .` y la compilación del `.exe` de GENERABASE; verificar que pasan y que no se compila PRUEBAESTANDAR
 - [ ] 3.4 Pedir al usuario que ejecute el nuevo `.exe` con su Access real y compruebe con una consulta en Access que el nº de días distintos y las LINEAS de un par de artículos y tiendas coinciden; verificar con su confirmación
