@@ -94,5 +94,5 @@
   - una ejecución con TODOS genera `PRUEBAESTANDAR_TD_<fecha>.xlsx` y `REPARTOESTANDAR_TD_<fecha>.xls`;
   - cambiar de un TIPO a TODOS no relee el Access.
 - [x] 6.3 Actualizar el README (selector con TODOS, abreviatura TD). Verificar releyendo la sección PRUEBAESTANDAR.
-- [ ] 6.4 Pasar todas las pruebas (`xvfb-run python -m pytest`), ejecutar `graphify update .`, hacer push y comprobar que «Compilar PRUEBAESTANDAR.exe» termina en verde con el artefacto disponible.
+- [x] 6.4 Pasar todas las pruebas (`xvfb-run python -m pytest`), ejecutar `graphify update .`, hacer push y comprobar que «Compilar PRUEBAESTANDAR.exe» termina en verde con el artefacto disponible.
 - [ ] 6.5 Prueba del usuario con TODOS y N = 1000. Verificar con el usuario que PRUEBAESTANDAR_TD y REPARTOESTANDAR_TD tienen los 1000 artículos y que el reparto se importa bien.
