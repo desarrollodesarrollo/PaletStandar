@@ -105,4 +105,4 @@
   - las pruebas de la ventana siguen pasando.
 - [x] 7.2 Mencionar la nota en el README (paso 2 de «Uso» de PRUEBAESTANDAR). Verificar releyendo.
 - [x] 7.3 Pasar todas las pruebas, ejecutar `graphify update .`, hacer push y comprobar que «Compilar PRUEBAESTANDAR.exe» termina en verde con el artefacto disponible.
-- [ ] 7.4 Comprobar con el usuario que la nota se ve bien en la ventana del nuevo exe.
+- [x] 7.4 Comprobar con el usuario que la nota se ve bien en la ventana del nuevo exe.
