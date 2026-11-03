@@ -2,24 +2,24 @@
 
 ## Purpose
 
-Leer y validar el FICHERO BASE y la TABLA DE TIENDAS Y MEDIOS de PRUEBAESTANDAR, generar PRUEBAESTANDAR.xlsx con las columnas ELECCIÓN rellenas sin alterar el resto del fichero base, y generar REPARTOESTANDAR.xls con la elección en unidades para el programa de importación.
+Leer y validar la base del TIPO (formada a partir del FICHERO BASE) y la TABLA DE TIENDAS Y MEDIOS de PRUEBAESTANDAR, generar PRUEBAESTANDAR con las columnas ELECCIÓN rellenas y generar REPARTOESTANDAR (.xls) con la elección en unidades para el programa de importación.
 
 ## Requirements
 
 ### Requirement: Estructura del fichero base
-El sistema SHALL leer la primera hoja del fichero base (.xlsx) con esta estructura:
+El fichero base que procesa PRUEBAESTANDAR SHALL ser la base del TIPO. El sistema la forma a partir del FICHERO BASE y del TIPO elegido, según la capacidad `pruebaestandar-integrado`. El usuario ya no la aporta. Tiene esta estructura:
 - Fila 1: código de tienda en cada columna de los bloques de tienda (columnas A–D vacías).
 - Fila 2: encabezados `CODIGO`, `PESO (Kg)`, `Volumen (L)`, `UNIxCAJA` en A–D y, desde la columna E, bloques de 3 columnas con los encabezados `BULTOS`, `LINEAS`, `ELECCIÓN`.
 - Fila 3 en adelante: un artículo por fila hasta la última fila con código en la columna A. La columna D (`UNIxCAJA`) contiene las unidades que lleva cada caja (bulto) del artículo.
 
-El sistema MUST aceptar cualquier nº de artículos (filas) y cualquier nº de bloques de tienda, sin depender de que sean 130–650 artículos o 180 tiendas. Una celda de BULTOS o LINEAS vacía SHALL interpretarse como 0. Los códigos de tienda y de artículo pueden ser cualquier número (por ejemplo 82 en lugar de 10082); sólo MUST coincidir los códigos de tienda del fichero base con los de la tabla de tiendas y medios.
+El sistema MUST aceptar cualquier nº de artículos (filas) y cualquier nº de bloques de tienda, sin depender de que sean 130–1000 artículos o 180 tiendas. Una celda de BULTOS o LINEAS vacía SHALL interpretarse como 0. BULTOS puede tener decimales. Los códigos de tienda y de artículo pueden ser cualquier número (por ejemplo 82 en lugar de 10082); sólo MUST coincidir los códigos de tienda del fichero base con los de la tabla de tiendas y medios.
 
 #### Scenario: Fichero base con estructura correcta
-- **WHEN** el usuario aporta un fichero base con 130 artículos y 180 bloques de tienda (columnas A–TX)
+- **WHEN** la base del TIPO tiene 130 artículos y 180 bloques de tienda (columnas A–TX)
 - **THEN** el sistema identifica 130 artículos y 180 tiendas con sus BULTOS, LINEAS y UNIxCAJA
 
 #### Scenario: Nº de artículos y tiendas distinto al habitual
-- **WHEN** el fichero base tiene 977 artículos y 3 bloques de tienda
+- **WHEN** la base del TIPO tiene 977 artículos y 3 bloques de tienda
 - **THEN** el sistema procesa los 977 artículos y las 3 tiendas sin error
 
 #### Scenario: Celdas vacías de salida
@@ -27,8 +27,12 @@ El sistema MUST aceptar cualquier nº de artículos (filas) y cualquier nº de b
 - **THEN** el sistema considera 0 bultos y 0 líneas para esa tienda
 
 #### Scenario: Códigos de tienda cortos
-- **WHEN** el fichero base y la tabla de tiendas usan los códigos 81 a 949
+- **WHEN** el FICHERO BASE y la tabla de tiendas usan los códigos 81 a 949
 - **THEN** el sistema procesa las tiendas con esos códigos sin error
+
+#### Scenario: Bultos con decimales
+- **WHEN** un artículo tiene 1,5 BULTOS en una tienda
+- **THEN** el máximo de cajas para esa tienda se calcula con 1,5 bultos
 
 ### Requirement: Validación del fichero base
 El sistema MUST rechazar el fichero base, sin generar ningún fichero de salida y con un mensaje en español que indique la columna o fila afectada, cuando:
@@ -81,27 +85,27 @@ El sistema MUST rechazar el proceso, sin generar salida, cuando alguna tienda de
 - **THEN** el sistema muestra un error que indica la tienda y el valor `CAMION`
 
 ### Requirement: Fichero de salida PRUEBAESTANDAR.xlsx
-Al terminar correctamente, el sistema SHALL guardar una copia del fichero base llamada `PRUEBAESTANDAR.xlsx` en la misma carpeta que el fichero base. En esa copia:
+Al terminar correctamente, el sistema SHALL guardar la base del TIPO como `PRUEBAESTANDAR_<TIPO>_<AAAAMMDD>.xlsx` en la carpeta del fichero SALALM. El TIPO va abreviado (AR, DR, AL o TD) y la fecha es la de ejecución, según la capacidad `pruebaestandar-integrado`. En ese fichero:
 - cada celda ELECCIÓN de un artículo seleccionado MUST contener un número entero ≥ 1 (tipo numérico, no texto);
-- cada celda ELECCIÓN de un artículo no seleccionado MUST quedar vacía, aunque en el fichero de entrada tuviera un valor;
-- el resto de celdas, hojas, anchos de columna y formatos MUST mantenerse como en el fichero base.
+- cada celda ELECCIÓN de un artículo no seleccionado MUST quedar vacía;
+- el resto de celdas MUST tener los valores de la base del TIPO: CODIGO, PESO, Volumen, UNIxCAJA, y BULTOS y LINEAS de cada tienda. No hay columna TIPO.
 
-El fichero base original MUST NOT modificarse nunca.
+Ni el FICHERO BASE ni los ficheros de entrada MUST modificarse nunca.
 
 #### Scenario: Salida generada
-- **WHEN** el proceso termina sin errores para el fichero `C:\datos\FICHERO_BASE_AR.xlsx`
-- **THEN** existe `C:\datos\PRUEBAESTANDAR.xlsx` con las columnas ELECCIÓN rellenas y `FICHERO_BASE_AR.xlsx` no ha cambiado
+- **WHEN** el proceso termina sin errores con el SALALM `C:\datos\salalm.xlsx` y el TIPO ALTA ROTACIÓN
+- **THEN** existe `C:\datos\PRUEBAESTANDAR_AR_<AAAAMMDD>.xlsx` con CODIGO, PESO, Volumen y UNIxCAJA en A–D, las tiendas desde la columna E y las columnas ELECCIÓN rellenas para los artículos de ALTA ROTACIÓN
 
 #### Scenario: Valores previos en ELECCIÓN
-- **WHEN** el fichero base trae un 3 en una celda ELECCIÓN de un artículo que el programa no selecciona
-- **THEN** esa celda queda vacía en PRUEBAESTANDAR.xlsx
+- **WHEN** un artículo no se selecciona en una tienda
+- **THEN** su celda ELECCIÓN de esa tienda queda vacía en PRUEBAESTANDAR.xlsx
 
 #### Scenario: Fichero de salida abierto en Excel
 - **WHEN** PRUEBAESTANDAR.xlsx está abierto en Excel y no se puede escribir
 - **THEN** el sistema muestra un error pidiendo cerrar el fichero y no pierde el cálculo hecho hasta volver a intentarlo o cancelar
 
 ### Requirement: Fichero de salida REPARTOESTANDAR.xls
-Al terminar correctamente, además de PRUEBAESTANDAR.xlsx, el sistema SHALL guardar `REPARTOESTANDAR.xls` en la misma carpeta que el fichero base, con el formato de la plantilla del programa de importación:
+Al terminar correctamente, además de PRUEBAESTANDAR.xlsx, el sistema SHALL guardar `REPARTOESTANDAR_<TIPO>_<AAAAMMDD>.xls` en la carpeta del fichero SALALM, con el mismo TIPO y la misma fecha que PRUEBAESTANDAR, con el formato de la plantilla del programa de importación:
 - Formato Excel 97-2003 (`.xls`, BIFF8), con las hojas `Hoja1`, `Hoja2` y `Hoja3`; los datos van en `Hoja1` y las otras dos quedan vacías.
 - Celda A1: el texto `Código`.
 - Fila 1, desde la columna B: una columna por tienda del fichero base, en el mismo orden, con el código de tienda como número.

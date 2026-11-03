@@ -7,15 +7,15 @@ Decidir, para cada tienda, qué artículos y cuántas cajas enteras de cada uno 
 ## Requirements
 
 ### Requirement: Nº de días de datos
-El cálculo SHALL recibir el nº de días de datos del fichero base como un número entero ≥ 1. Cualquier otro valor (0, negativo, decimal, texto o vacío) MUST rechazarse antes de calcular.
+El cálculo SHALL recibir el nº de días de datos como un número entero ≥ 1. Ese número no lo escribe el usuario: es el nº de fechas `MVFECI` distintas de las filas PI del Access, según la capacidad `pruebaestandar-integrado`. Si el recuento no da un entero ≥ 1, el sistema MUST rechazar el proceso antes de calcular.
 
 #### Scenario: Días válidos
-- **WHEN** el usuario indica 5 días
+- **WHEN** el Access tiene filas PI en 5 fechas distintas
 - **THEN** el cálculo se realiza con 5 días
 
 #### Scenario: Días no válidos
-- **WHEN** el usuario indica `0`, `-3`, `2,5` o `abc`
-- **THEN** el sistema no calcula y pide un nº entero de días mayor que 0
+- **WHEN** el Access no tiene ninguna fila PI con fecha
+- **THEN** el sistema no calcula e informa de que no se ha podido contar el nº de días de datos
 
 ### Requirement: Artículos elegibles
 Para una tienda, un artículo SHALL ser elegible sólo si sus BULTOS en esa tienda son mayores que 0 y tiene peso y volumen válidos. Un artículo no elegible MUST NOT seleccionarse nunca en esa tienda.
