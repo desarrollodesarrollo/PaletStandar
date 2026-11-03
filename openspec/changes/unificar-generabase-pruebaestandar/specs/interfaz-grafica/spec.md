@@ -8,6 +8,7 @@ Al iniciar PRUEBAESTANDAR, el sistema SHALL abrir una ventana titulada `PRUEBAES
   - MAESTRO DE CADUCIDAD (`.xlsx`),
   - MOVIMIENTOS (Access, `.accdb` o `.mdb`),
   - TABLA DE TIENDAS Y MEDIOS (`.xlsx`);
+- debajo de los selectores del MAESTRO y del MAESTRO DE CADUCIDAD, una nota visible con el texto `No puede haber valores repetidos: sólo un almacén.`. Es sólo una indicación: el programa no cambia cómo lee esos ficheros;
 - una caja de texto para el nº de artículos del FICHERO BASE;
 - un selector de TIPO de palet estándar con las opciones `ALTA ROTACIÓN`, `DROGUERÍA`, `ALIMENTACIÓN` y `TODOS`, en ese orden y sin ninguna elegida al abrir;
 - un botón `Ejecutar`.
@@ -16,7 +17,11 @@ La ventana MUST NOT tener caja para el nº de días de datos, porque se calcula 
 
 #### Scenario: Apertura del programa
 - **WHEN** el usuario inicia PRUEBAESTANDAR
-- **THEN** ve los cinco selectores de fichero, la caja del nº de artículos, el selector de TIPO sin valor y con las cuatro opciones, el botón Ejecutar y ninguna caja de días
+- **THEN** ve los cinco selectores de fichero, la nota sobre valores repetidos bajo el MAESTRO y el MAESTRO DE CADUCIDAD, la caja del nº de artículos, el selector de TIPO sin valor y con las cuatro opciones, el botón Ejecutar y ninguna caja de días
+
+#### Scenario: Nota del MAESTRO y del MAESTRO DE CADUCIDAD
+- **WHEN** el usuario abre PRUEBAESTANDAR
+- **THEN** bajo el selector del MAESTRO y bajo el del MAESTRO DE CADUCIDAD lee `No puede haber valores repetidos: sólo un almacén.`, y bajo los demás selectores no aparece ninguna nota
 
 ### Requirement: Validación de datos antes de ejecutar
 Al pulsar `Ejecutar`, el sistema MUST comprobar que:

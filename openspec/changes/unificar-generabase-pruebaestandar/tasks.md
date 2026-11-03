@@ -95,4 +95,14 @@
   - cambiar de un TIPO a TODOS no relee el Access.
 - [x] 6.3 Actualizar el README (selector con TODOS, abreviatura TD). Verificar releyendo la sección PRUEBAESTANDAR.
 - [x] 6.4 Pasar todas las pruebas (`xvfb-run python -m pytest`), ejecutar `graphify update .`, hacer push y comprobar que «Compilar PRUEBAESTANDAR.exe» termina en verde con el artefacto disponible.
-- [ ] 6.5 Prueba del usuario con TODOS y N = 1000. Verificar con el usuario que PRUEBAESTANDAR_TD y REPARTOESTANDAR_TD tienen los 1000 artículos y que el reparto se importa bien.
+- [x] 6.5 Prueba del usuario con TODOS y N = 1000. Verificar con el usuario que PRUEBAESTANDAR_TD y REPARTOESTANDAR_TD tienen los 1000 artículos y que el reparto se importa bien.
+
+## 7. Nota «un solo almacén» en el MAESTRO y el MAESTRO DE CADUCIDAD
+
+- [ ] 7.1 En `pruebaestandar/gui.py`, añadir `NOTA_UN_ALMACEN` y `NOTAS`, y mostrar la nota en gris bajo los selectores del MAESTRO y del MAESTRO DE CADUCIDAD, con las filas de la rejilla numeradas por contador. Verificar con `xvfb-run pytest tests/test_gui.py` que:
+  - hay exactamente dos notas, la del `maestro` y la de `caducidad`;
+  - su texto es `No puede haber valores repetidos: sólo un almacén.`;
+  - las pruebas de la ventana siguen pasando.
+- [ ] 7.2 Mencionar la nota en el README (paso 2 de «Uso» de PRUEBAESTANDAR). Verificar releyendo.
+- [ ] 7.3 Pasar todas las pruebas, ejecutar `graphify update .`, hacer push y comprobar que «Compilar PRUEBAESTANDAR.exe» termina en verde con el artefacto disponible.
+- [ ] 7.4 Comprobar con el usuario que la nota se ve bien en la ventana del nuevo exe.
