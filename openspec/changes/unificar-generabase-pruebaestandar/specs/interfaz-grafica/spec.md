@@ -30,6 +30,10 @@ Si falta algo, SHALL mostrar un mensaje que indique qué falta y no iniciar el p
 - **WHEN** el usuario pulsa Ejecutar sin haber elegido la tabla de tiendas
 - **THEN** ve un mensaje pidiendo seleccionar la TABLA DE TIENDAS Y MEDIOS
 
+#### Scenario: Días no numéricos
+- **WHEN** el usuario pulsa Ejecutar
+- **THEN** no se le pide ni se valida un nº de días escrito a mano, porque el nº de días se cuenta desde el Access
+
 #### Scenario: Nº de artículos no válido
 - **WHEN** el usuario escribe `mil` en la caja del nº de artículos y pulsa Ejecutar
 - **THEN** ve un mensaje pidiendo un nº entero de artículos mayor que 0

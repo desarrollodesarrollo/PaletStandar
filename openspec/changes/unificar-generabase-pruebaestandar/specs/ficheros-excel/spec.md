@@ -40,7 +40,7 @@ Ni el FICHERO BASE ni los ficheros de entrada MUST modificarse nunca.
 - **WHEN** el proceso termina sin errores con el SALALM `C:\datos\salalm.xlsx` y el TIPO ALTA ROTACIÓN
 - **THEN** existe `C:\datos\PRUEBAESTANDAR.xlsx` con CODIGO, PESO, Volumen y UNIxCAJA en A–D, las tiendas desde la columna E y las columnas ELECCIÓN rellenas para los artículos de ALTA ROTACIÓN
 
-#### Scenario: ELECCIÓN vacía en el FICHERO BASE
+#### Scenario: Valores previos en ELECCIÓN
 - **WHEN** un artículo no se selecciona en una tienda
 - **THEN** su celda ELECCIÓN de esa tienda queda vacía en PRUEBAESTANDAR.xlsx
 
