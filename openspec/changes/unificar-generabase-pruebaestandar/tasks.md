@@ -73,7 +73,7 @@
 
 - [x] 5.1 Añadir `access-parser==0.0.6` a `requirements.txt` y `generabase/**` a los `paths` de `.github/workflows/compilar-exe.yml`. Verificar que en un entorno nuevo `pip install -r requirements-dev.txt` instala todo y que `python -m pytest -q` pasa (`tests` y `tests_generabase`).
 - [x] 5.2 Actualizar la sección PRUEBAESTANDAR del `README.md`: entradas, TIPO, días automáticos, 4 salidas con TIPO (AR/DR/AL) y fecha en el nombre y reutilización al cambiar de TIPO. La sección de GENERABASE se mantiene. Verificar releyendo que no queda ninguna mención a escribir los días a mano.
-- [ ] 5.3 Hacer push y comprobar que el workflow «Compilar PRUEBAESTANDAR.exe» termina en verde, con la ventana PRUEBAESTANDAR abierta en el smoke check y el artefacto `PRUEBAESTANDAR-windows` disponible. Ejecutar `graphify update .`.
+- [x] 5.3 Hacer push y comprobar que el workflow «Compilar PRUEBAESTANDAR.exe» termina en verde, con la ventana PRUEBAESTANDAR abierta en el smoke check y el artefacto `PRUEBAESTANDAR-windows` disponible. Ejecutar `graphify update .`.
 - [ ] 5.4 Prueba del usuario con sus ficheros reales. Verificar con el usuario que:
   - una ejecución con ALTA ROTACIÓN genera los 4 ficheros;
   - una segunda con DROGUERÍA no relee el Access;
