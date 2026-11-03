@@ -23,7 +23,7 @@ Las reglas del algoritmo (96 %, D'Hondt, densidad, desempates) están cerradas y
 
 **Non-Goals:**
 - Calcular varios TIPOS en una sola ejecución.
-- Poner nombres de salida distintos por TIPO.
+- Cambiar los nombres de salida de GENERABASE.exe, que sigue con `SALALM FILTRADO.xlsx` y `FICHERO BASE.xlsx`.
 - Aceptar como entrada un FICHERO BASE ya generado.
 - Cambiar el algoritmo de selección o el formato de REPARTOESTANDAR.xls.
 - Mejorar la velocidad de lectura del Access.
@@ -31,7 +31,7 @@ Las reglas del algoritmo (96 %, D'Hondt, densidad, desempates) están cerradas y
 ## Decisions
 
 ### 1. El programa unificado es PRUEBAESTANDAR; GENERABASE sigue aparte
-La ventana PRUEBAESTANDAR (`pruebaestandar/gui.py`, `PRUEBAESTANDAR.pyw`, `PRUEBAESTANDAR.exe`) pasa a tener las 5 entradas, N y TIPO. El usuario pidió «adaptar PRUEBAESTANDAR» y «juntar los 2 programas en uno». Mantener el nombre conserva el exe y las salidas que ya conoce. GENERABASE no se borra porque el usuario pidió no tocarlo, y sirve para generar sólo el FICHERO BASE.
+La ventana PRUEBAESTANDAR (`pruebaestandar/gui.py`, `PRUEBAESTANDAR.pyw`, `PRUEBAESTANDAR.exe`) pasa a tener las 5 entradas, N y TIPO. El usuario pidió «adaptar PRUEBAESTANDAR» y «juntar los 2 programas en uno». Mantener el nombre conserva el exe que ya conoce. GENERABASE no se borra porque el usuario pidió no tocarlo, y sirve para generar sólo el FICHERO BASE.
 - *Alternativa descartada:* un tercer programa con otro nombre. Añade otro exe sin necesidad.
 
 ### 2. Primero los N artículos, después el TIPO
@@ -90,13 +90,27 @@ Al ejecutar, si la clave coincide, se salta `preparar` y se pasa directamente a 
 - `ENTRADAS` tiene 5 tuplas `(clave, nombre, tipos)`, igual que en GENERABASE. La del Access filtra `*.accdb *.mdb`.
 - N es un `ttk.Entry`, validado con `fichero_base.parsear_n`.
 - TIPO es un `ttk.Combobox(state="readonly")` con `TIPOS` y vacío al abrir.
-- La confirmación de sobrescritura es única para los 4 nombres, calculados desde la carpeta del SALALM.
+- La confirmación de sobrescritura es única para los 4 nombres, calculados con `rutas_salida(carpeta del SALALM, tipo, fecha)` (decisión 8).
 - El hilo de trabajo usa una cola y `after`. La etiqueta de fase llega por el callback `progreso`.
 - Si hay un error de escritura, `askretrycancel` llama a `calculo.guardar()` sin recalcular.
 - El resumen une los dos textos: primero los datos de GENERABASE, luego el bloque «PALET ESTÁNDAR — TIPO …».
 - La validación mira, por orden, los ficheros en el orden de la ventana, después N y después TIPO.
 
-### 8. Empaquetado
+### 8. Nombres con TIPO y fecha
+- `integrado.ABREVIATURAS = {"ALTA ROTACIÓN": "AR", "DROGUERÍA": "DR", "ALIMENTACIÓN": "AL"}`.
+- `integrado.rutas_salida(ruta_salalm, tipo, fecha: date) -> RutasSalida(salalm, base, prueba, reparto)` devuelve:
+  - `SALALM FILTRADO_{f}.xlsx`
+  - `FICHERO BASE_{f}.xlsx`
+  - `PRUEBAESTANDAR_{ab}_{f}.xlsx`
+  - `REPARTOESTANDAR_{ab}_{f}.xls`
+
+  Aquí `f = fecha.strftime("%Y%m%d")` y todos van en la carpeta del SALALM.
+- **La fecha se fija una sola vez.** La ventana llama a `date.today()` al pulsar Ejecutar, antes de la confirmación. Esa fecha se pasa a `calcular_tipo` y queda guardada en el `CalculoIntegrado`. Así coinciden la confirmación, el guardado, el reintento y el resumen, aunque el proceso cruce la medianoche. Las pruebas pasan una fecha fija.
+- **Las rutas se reciben, no se calculan.** `generabase.proceso.calcular_datos` y `pruebaestandar.proceso.calcular_desde_libro` reciben las rutas de destino como parámetros. Las funciones `rutas_salida` actuales de cada paquete no cambian, así que GENERABASE.exe y el `calcular(ruta_base, …)` antiguo siguen con sus nombres.
+- `escritura.ruta_salida` rechaza un fichero base llamado PRUEBAESTANDAR.xlsx. Esto no afecta al flujo integrado, porque la base del TIPO está en memoria.
+- *Alternativa descartada:* poner la fecha de los datos (última MVFECI). El usuario eligió la fecha de ejecución.
+
+### 9. Empaquetado
 - `requirements.txt` añade `access-parser==0.0.6`.
 - `compilar-exe.yml` añade `generabase/**` a los `paths`.
 - PyInstaller encuentra `generabase` y `access_parser` por import.
@@ -105,7 +119,9 @@ Al ejecutar, si la clave coincide, se salta `preparar` y se pasa directamente a 
 ## Risks / Trade-offs
 
 - [El FICHERO BASE de 1000 artículos puede tener pocos de un TIPO] → El resumen muestra «TIPO: k artículos de los N». Si k = 0, hay un error claro que sugiere aumentar N.
-- [Los nombres fijos hacen que una ejecución con otro TIPO sobrescriba PRUEBAESTANDAR.xlsx y REPARTOESTANDAR.xls] → La confirmación única nombra los ficheros existentes. Se ha decidido mantener los nombres porque el programa de importación espera REPARTOESTANDAR.xls.
+- [El programa de importación podría buscar el nombre fijo `REPARTOESTANDAR.xls`] → Se ha cambiado el nombre porque lo pidió el usuario, y el formato interno no cambia. Lo comprobará el usuario en la tarea 5.4. Si su programa exige el nombre fijo, basta con renombrar el fichero o seleccionarlo.
+- [Con otro N el mismo día, SALALM FILTRADO y FICHERO BASE de ese día se sobrescriben] → La confirmación única los nombra. Los ficheros del palet de otros TIPOS no se tocan.
+- [Los ficheros con fecha se acumulan en la carpeta] → Es lo deseado, porque sirven de histórico. El programa no borra nada.
 - [La caché retiene en memoria los libros y los movimientos usados, unos cientos de MB con el Access real] → Sólo se guarda un `Datos`. Las columnas crudas del Access ya se liberan en `filtrar`.
 - [`delete_cols` de openpyxl no mueve los anchos de columna] → Los anchos se reasignan explícitamente y una prueba comprueba la estructura y los anchos.
 - [`dias_pi` puede incluir días con PI sólo de tiendas fuera de rango] → Es la definición pedida por el usuario. El resumen muestra también los días de los movimientos usados para poder comparar.
@@ -115,4 +131,5 @@ Al ejecutar, si la clave coincide, se salta `preparar` y se pasa directamente a 
 
 - Se publica un nuevo `PRUEBAESTANDAR.exe` desde el artefacto `PRUEBAESTANDAR-windows` de GitHub Actions. GENERABASE.exe sigue igual.
 - El usuario deja de aportar FICHERO BASE y días.
+- Los ficheros pasan a llamarse con fecha, y los del palet también con TIPO. Los ficheros antiguos sin fecha no se tocan.
 - Para volver atrás basta con usar el exe anterior.

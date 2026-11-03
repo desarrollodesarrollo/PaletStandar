@@ -23,19 +23,20 @@
   - las tiendas empiezan en la columna E y los valores están desplazados una columna respecto al FICHERO BASE;
   - `pruebaestandar.lectura.extraer_datos_base` la lee sin error, con BULTOS decimales (1,5).
 - [ ] 3.3 Implementar `verificar_base_tipo(libro_tipo, libro_base, tipo)`, comprobación cruzada celda a celda contra la hoja TODOS. Verificar con una prueba que pasa con una base correcta y que falla si se altera un BULTOS o se desplaza una columna.
-- [ ] 3.4 Implementar `Datos`, `clave_entradas(rutas, n)` (ruta resuelta, `mtime_ns`, tamaño y N) y `preparar(...)`. Verificar con una prueba que la clave cambia al modificar un fichero o N y no cambia si nada cambia.
-- [ ] 3.5 Implementar `calcular_tipo(datos, tipo, ruta_tabla, progreso)`: filtro, comprobación de `dias_pi ≥ 1`, base del TIPO, verificación cruzada y `calcular_desde_libro` con `dias_pi`. Debe devolver un `CalculoIntegrado`, cuyo método `guardar()` guarda los 4 ficheros en la carpeta del SALALM, y un resumen combinado. Verificar con una prueba de extremo a extremo con los ficheros sintéticos de `tests_generabase/apoyo.py` y una tabla de medios. La prueba debe comprobar:
-  - que existen los 4 ficheros con sus nombres;
-  - que FICHERO BASE.xlsx es igual al que genera `generabase.proceso.ejecutar`;
-  - que PRUEBAESTANDAR.xlsx tiene el formato antiguo, sólo los artículos del TIPO y las ELECCIÓN verificadas;
-  - que REPARTOESTANDAR.xls (leído con xlrd) es igual a ELECCIÓN × UNIxCAJA;
+- [ ] 3.4 Implementar `ABREVIATURAS` (AR / DR / AL) y `rutas_salida(ruta_salalm, tipo, fecha)`. Verificar con una prueba que, para el 03/11/2026, la carpeta `C:\datos` y ALTA ROTACIÓN, devuelve `SALALM FILTRADO_20261103.xlsx`, `FICHERO BASE_20261103.xlsx`, `PRUEBAESTANDAR_AR_20261103.xlsx` y `REPARTOESTANDAR_AR_20261103.xls`. Con DROGUERÍA debe dar `_DR_` y con ALIMENTACIÓN `_AL_`. Verificar también que `generabase.proceso.rutas_salida` y `pruebaestandar.proceso.rutas_salida` siguen devolviendo los nombres sin fecha.
+- [ ] 3.5 Implementar `Datos`, `clave_entradas(rutas, n)` (ruta resuelta, `mtime_ns`, tamaño y N) y `preparar(...)`. Verificar con una prueba que la clave cambia al modificar un fichero o N y no cambia si nada cambia.
+- [ ] 3.6 Implementar `calcular_tipo(datos, tipo, ruta_tabla, fecha, progreso)`: filtro, comprobación de `dias_pi ≥ 1`, base del TIPO, verificación cruzada y `calcular_desde_libro` con `dias_pi`. Debe devolver un `CalculoIntegrado`, cuyo método `guardar()` guarda los 4 ficheros en la carpeta del SALALM con los nombres de `rutas_salida`, y un resumen combinado. Verificar con una prueba de extremo a extremo con los ficheros sintéticos de `tests_generabase/apoyo.py` y una tabla de medios. La prueba debe comprobar:
+  - que existen exactamente los 4 ficheros con TIPO y fecha en el nombre, con una fecha fija en la prueba;
+  - que el FICHERO BASE es igual al que genera `generabase.proceso.ejecutar`;
+  - que PRUEBAESTANDAR tiene el formato antiguo, sólo los artículos del TIPO y las ELECCIÓN verificadas;
+  - que REPARTOESTANDAR (leído con xlrd) es igual a ELECCIÓN × UNIxCAJA;
   - que se usan los días contados.
-- [ ] 3.6 Verificar con pruebas que:
+- [ ] 3.7 Verificar con pruebas que:
   - con días = 0, el error no deja ningún fichero;
   - con una tienda que falta en la tabla, no se guarda ninguno de los 4;
-  - un `PermissionError` en PRUEBAESTANDAR.xlsx permite reintentar sin volver a llamar a `access.leer_movimientos`;
-  - cambiar el TIPO con el mismo `Datos` no relee nada y da un FICHERO BASE idéntico.
-- [ ] 3.7 Implementar `ResumenIntegrado.texto()`, que muestra:
+  - un `PermissionError` en PRUEBAESTANDAR permite reintentar sin volver a llamar a `access.leer_movimientos` y con los mismos nombres;
+  - cambiar el TIPO con el mismo `Datos` y la misma fecha no relee nada, da un FICHERO BASE idéntico y no toca los ficheros del palet del TIPO anterior.
+- [ ] 3.8 Implementar `ResumenIntegrado.texto()`, que muestra:
   - las 4 rutas;
   - si se han reutilizado los datos;
   - el bloque de GENERABASE;
@@ -60,8 +61,9 @@
   - falta la tabla;
   - N = «mil»;
   - falta el TIPO;
-  - existe sólo REPARTOESTANDAR.xls, se responde No y no se genera nada.
-- [ ] 4.3 Implementar la ejecución en un hilo con caché de `Datos` por clave, el reintento de guardado y la presentación del resumen y de los errores sin traza. Verificar con pruebas de GUI que:
+  - de los 4 ficheros sólo existe `REPARTOESTANDAR_AR_<hoy>.xls`, la confirmación nombra sólo ese, se responde No y no se genera nada;
+  - existen los ficheros del palet de DR del mismo día y se ejecuta AR: no se pregunta por ellos.
+- [ ] 4.3 Implementar la ejecución en un hilo con caché de `Datos` por clave. La fecha (`date.today()`) se fija al pulsar Ejecutar y es la que se usa en la confirmación y el guardado. Implementar también el reintento de guardado y la presentación del resumen y de los errores sin traza. Verificar con pruebas de GUI que:
   - una ejecución correcta genera los 4 ficheros;
   - una segunda ejecución con otro TIPO no llama a `access.leer_movimientos` y el resumen indica que se han reutilizado los datos;
   - el reintento tras un `PermissionError` funciona;
@@ -70,10 +72,11 @@
 ## 5. Empaquetado, documentación y comprobación final
 
 - [ ] 5.1 Añadir `access-parser==0.0.6` a `requirements.txt` y `generabase/**` a los `paths` de `.github/workflows/compilar-exe.yml`. Verificar que en un entorno nuevo `pip install -r requirements-dev.txt` instala todo y que `python -m pytest -q` pasa (`tests` y `tests_generabase`).
-- [ ] 5.2 Actualizar la sección PRUEBAESTANDAR del `README.md`: entradas, TIPO, días automáticos, 4 salidas y reutilización al cambiar de TIPO. La sección de GENERABASE se mantiene. Verificar releyendo que no queda ninguna mención a escribir los días a mano.
+- [ ] 5.2 Actualizar la sección PRUEBAESTANDAR del `README.md`: entradas, TIPO, días automáticos, 4 salidas con TIPO (AR/DR/AL) y fecha en el nombre y reutilización al cambiar de TIPO. La sección de GENERABASE se mantiene. Verificar releyendo que no queda ninguna mención a escribir los días a mano.
 - [ ] 5.3 Hacer push y comprobar que el workflow «Compilar PRUEBAESTANDAR.exe» termina en verde, con la ventana PRUEBAESTANDAR abierta en el smoke check y el artefacto `PRUEBAESTANDAR-windows` disponible. Ejecutar `graphify update .`.
 - [ ] 5.4 Prueba del usuario con sus ficheros reales. Verificar con el usuario que:
   - una ejecución con ALTA ROTACIÓN genera los 4 ficheros;
   - una segunda con DROGUERÍA no relee el Access;
   - el nº de días coincide con su consulta en Access (valores distintos de MVFECI con MVTMOV = "PI");
-  - REPARTOESTANDAR.xls se importa bien en su programa.
+  - los nombres llevan el TIPO (AR/DR/AL) y la fecha del día;
+  - `REPARTOESTANDAR_<TIPO>_<fecha>.xls` se importa bien en su programa, aunque ya no se llame `REPARTOESTANDAR.xls`.

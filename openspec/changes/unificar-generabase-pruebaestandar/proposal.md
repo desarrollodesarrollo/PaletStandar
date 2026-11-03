@@ -11,10 +11,17 @@ Hoy el trabajo se hace en dos pasos con dos programas. Primero GENERABASE genera
 - **Orden de la selección.** Primero se toman los N artículos con más CAJAS de SALALM FILTRADO, sea cual sea su tipo; así se forma el FICHERO BASE, que no cambia. Después, de esos N artículos, sólo se usan los del TIPO elegido para calcular el palet estándar.
 - **Nº de días automático.** El nº de días de datos ya no se escribe a mano. **BREAKING:** desaparece la caja de días. El programa lo calcula como el nº de valores distintos de `MVFECI` en las filas del Access con `MVTMOV = "PI"`.
 - **Salidas.** Se generan 4 ficheros en la carpeta del SALALM:
-  - `SALALM FILTRADO.xlsx` y `FICHERO BASE.xlsx`, iguales que en GENERABASE.
-  - `PRUEBAESTANDAR.xlsx` y `REPARTOESTANDAR.xls`, con la misma estructura que ahora:
-    - PRUEBAESTANDAR.xlsx conserva el formato antiguo: CODIGO, PESO, Volumen y UNIxCAJA en A–D, sin la columna TIPO, y las tiendas desde la columna E. Contiene sólo los artículos del TIPO elegido, con ELECCIÓN rellena.
-    - REPARTOESTANDAR.xls no cambia de formato. Contiene los artículos del TIPO elegido.
+  - SALALM FILTRADO y FICHERO BASE, con el mismo contenido que en GENERABASE.
+  - PRUEBAESTANDAR (.xlsx) y REPARTOESTANDAR (.xls), con la misma estructura que ahora:
+    - PRUEBAESTANDAR conserva el formato antiguo: CODIGO, PESO, Volumen y UNIxCAJA en A–D, sin la columna TIPO, y las tiendas desde la columna E. Contiene sólo los artículos del TIPO elegido, con ELECCIÓN rellena.
+    - REPARTOESTANDAR no cambia de formato. Contiene los artículos del TIPO elegido.
+- **Nombres con TIPO y fecha.** Los nombres de los ficheros llevan la fecha de ejecución (`AAAAMMDD`), y los dos del palet llevan además el TIPO abreviado: AR = ALTA ROTACIÓN, DR = DROGUERÍA, AL = ALIMENTACIÓN. **BREAKING:** desaparecen los nombres fijos `PRUEBAESTANDAR.xlsx` y `REPARTOESTANDAR.xls`. Por ejemplo, el 03/11/2026 con ALTA ROTACIÓN:
+  - `SALALM FILTRADO_20261103.xlsx`
+  - `FICHERO BASE_20261103.xlsx`
+  - `PRUEBAESTANDAR_AR_20261103.xlsx`
+  - `REPARTOESTANDAR_AR_20261103.xls`
+
+  Así, calcular otro TIPO no sobrescribe los ficheros del palet de los demás TIPOS.
 - **Confirmación y reintento.** Una única confirmación antes de sobrescribir cualquiera de los 4 ficheros. Si un fichero está abierto, se puede reintentar sin repetir el cálculo.
 - **Otro TIPO sin releer el Access.** Si después de una ejecución sólo se cambia el TIPO o la tabla de tiendas, el programa reutiliza lo ya leído y calcula otro TIPO sin volver a leer el Access, que tarda unos 10 minutos.
 - **Resumen.** El resumen une:
@@ -44,7 +51,7 @@ Hoy el trabajo se hace en dos pasos con dos programas. Primero GENERABASE genera
 
   También cambian las validaciones, la confirmación de sobrescritura (4 ficheros), el resultado y el tiempo de respuesta, porque ahora se lee el Access.
 - `seleccion-bultos`: el requisito «Nº de días de datos» pasa a obtener los días del Access en lugar de la entrada del usuario.
-- `ficheros-excel`: el fichero base que procesa PRUEBAESTANDAR ya no lo aporta el usuario; se forma a partir del FICHERO BASE y del TIPO. PRUEBAESTANDAR.xlsx y REPARTOESTANDAR.xls se guardan en la carpeta del SALALM.
+- `ficheros-excel`: el fichero base que procesa PRUEBAESTANDAR ya no lo aporta el usuario; se forma a partir del FICHERO BASE y del TIPO. PRUEBAESTANDAR y REPARTOESTANDAR se guardan en la carpeta del SALALM, con el TIPO abreviado y la fecha en el nombre.
 
 ## Impact
 
@@ -55,4 +62,6 @@ Hoy el trabajo se hace en dos pasos con dos programas. Primero GENERABASE genera
 - **Dependencias:** `requirements.txt` añade `access-parser==0.0.6`. PRUEBAESTANDAR.exe pasa a incluir el lector de Access.
 - **CI:** el workflow `compilar-exe.yml` también se dispara con cambios en `generabase/**`.
 - **Pruebas:** se rehacen `tests/test_gui.py` y se añaden pruebas del flujo integrado. Las pruebas actuales del cálculo siguen valiendo.
+- **Programa de importación:** el fichero de reparto deja de llamarse `REPARTOESTANDAR.xls`. Si el programa de importación busca ese nombre exacto, habrá que elegir el fichero nuevo o renombrarlo. El formato interno no cambia.
+- **GENERABASE.exe:** conserva sus nombres actuales, sin fecha.
 - **Uso:** el usuario ya no aporta un FICHERO BASE ni escribe los días. Una ejecución completa tarda lo que tarde la lectura del Access, unos 10 minutos con el Access real en red.

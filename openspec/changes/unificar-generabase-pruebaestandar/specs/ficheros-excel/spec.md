@@ -29,7 +29,7 @@ El sistema MUST aceptar cualquier nº de artículos (filas) y cualquier nº de b
 - **THEN** el máximo de cajas para esa tienda se calcula con 1,5 bultos
 
 ### Requirement: Fichero de salida PRUEBAESTANDAR.xlsx
-Al terminar correctamente, el sistema SHALL guardar la base del TIPO como `PRUEBAESTANDAR.xlsx` en la carpeta del fichero SALALM. En ese fichero:
+Al terminar correctamente, el sistema SHALL guardar la base del TIPO como `PRUEBAESTANDAR_<TIPO>_<AAAAMMDD>.xlsx` en la carpeta del fichero SALALM. El TIPO va abreviado (AR, DR o AL) y la fecha es la de ejecución, según la capacidad `pruebaestandar-integrado`. En ese fichero:
 - cada celda ELECCIÓN de un artículo seleccionado MUST contener un número entero ≥ 1 (tipo numérico, no texto);
 - cada celda ELECCIÓN de un artículo no seleccionado MUST quedar vacía;
 - el resto de celdas MUST tener los valores de la base del TIPO: CODIGO, PESO, Volumen, UNIxCAJA, y BULTOS y LINEAS de cada tienda. No hay columna TIPO.
@@ -38,7 +38,7 @@ Ni el FICHERO BASE ni los ficheros de entrada MUST modificarse nunca.
 
 #### Scenario: Salida generada
 - **WHEN** el proceso termina sin errores con el SALALM `C:\datos\salalm.xlsx` y el TIPO ALTA ROTACIÓN
-- **THEN** existe `C:\datos\PRUEBAESTANDAR.xlsx` con CODIGO, PESO, Volumen y UNIxCAJA en A–D, las tiendas desde la columna E y las columnas ELECCIÓN rellenas para los artículos de ALTA ROTACIÓN
+- **THEN** existe `C:\datos\PRUEBAESTANDAR_AR_<AAAAMMDD>.xlsx` con CODIGO, PESO, Volumen y UNIxCAJA en A–D, las tiendas desde la columna E y las columnas ELECCIÓN rellenas para los artículos de ALTA ROTACIÓN
 
 #### Scenario: Valores previos en ELECCIÓN
 - **WHEN** un artículo no se selecciona en una tienda
@@ -49,7 +49,7 @@ Ni el FICHERO BASE ni los ficheros de entrada MUST modificarse nunca.
 - **THEN** el sistema muestra un error pidiendo cerrar el fichero y no pierde el cálculo hecho hasta volver a intentarlo o cancelar
 
 ### Requirement: Fichero de salida REPARTOESTANDAR.xls
-Al terminar correctamente, además de PRUEBAESTANDAR.xlsx, el sistema SHALL guardar `REPARTOESTANDAR.xls` en la carpeta del fichero SALALM, con el formato de la plantilla del programa de importación:
+Al terminar correctamente, además de PRUEBAESTANDAR.xlsx, el sistema SHALL guardar `REPARTOESTANDAR_<TIPO>_<AAAAMMDD>.xls` en la carpeta del fichero SALALM, con el mismo TIPO y la misma fecha que PRUEBAESTANDAR, con el formato de la plantilla del programa de importación:
 - Formato Excel 97-2003 (`.xls`, BIFF8), con las hojas `Hoja1`, `Hoja2` y `Hoja3`; los datos van en `Hoja1` y las otras dos quedan vacías.
 - Celda A1: el texto `Código`.
 - Fila 1, desde la columna B: una columna por tienda del fichero base, en el mismo orden, con el código de tienda como número.

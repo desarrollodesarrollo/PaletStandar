@@ -46,10 +46,12 @@ Si falta algo, SHALL mostrar un mensaje que indique qué falta y no iniciar el p
 Durante el proceso, la ventana MUST seguir respondiendo y el botón `Ejecutar` MUST estar desactivado. SHALL mostrarse la fase en curso, por ejemplo la lectura del Access, que puede tardar unos minutos.
 
 Si alguno de estos ficheros ya existe en la carpeta del SALALM, el sistema MUST pedir una única confirmación antes de empezar, que nombre sólo los ficheros que ya existen:
-- `SALALM FILTRADO.xlsx`,
-- `FICHERO BASE.xlsx`,
-- `PRUEBAESTANDAR.xlsx`,
-- `REPARTOESTANDAR.xls`.
+- `SALALM FILTRADO_<AAAAMMDD>.xlsx`,
+- `FICHERO BASE_<AAAAMMDD>.xlsx`,
+- `PRUEBAESTANDAR_<TIPO>_<AAAAMMDD>.xlsx`,
+- `REPARTOESTANDAR_<TIPO>_<AAAAMMDD>.xls`.
+
+Estos nombres llevan el TIPO elegido y la fecha del momento de pulsar Ejecutar, según la capacidad `pruebaestandar-integrado`.
 
 Si el usuario no confirma, no se genera ni se modifica ninguno.
 
@@ -58,12 +60,12 @@ Si el usuario no confirma, no se genera ni se modifica ninguno.
 - **THEN** el botón Ejecutar está desactivado y se muestran un indicador de progreso y la fase en curso
 
 #### Scenario: Salida ya existente
-- **WHEN** ya existe PRUEBAESTANDAR.xlsx y el usuario responde `No` a la confirmación
+- **WHEN** ya existe `PRUEBAESTANDAR_AR_20261103.xlsx`, el usuario ejecuta ALTA ROTACIÓN ese día y responde `No` a la confirmación
 - **THEN** el fichero existente no cambia, no se genera ninguno de los otros tres y la ventana vuelve a quedar lista
 
 #### Scenario: Sólo existe el fichero de reparto
-- **WHEN** sólo existe REPARTOESTANDAR.xls
-- **THEN** la confirmación nombra sólo REPARTOESTANDAR.xls y, si el usuario responde `No`, no se genera ninguno de los cuatro ficheros
+- **WHEN** de los 4 ficheros de la ejecución sólo existe ya `REPARTOESTANDAR_AR_20261103.xls`
+- **THEN** la confirmación nombra sólo ese fichero y, si el usuario responde `No`, no se genera ninguno de los cuatro ficheros
 
 ### Requirement: Resultado y errores
 Al terminar correctamente, el sistema SHALL mostrar:
@@ -78,7 +80,7 @@ Si se han reutilizado el FICHERO BASE y los días de la ejecución anterior, el 
 
 #### Scenario: Ejecución correcta
 - **WHEN** el proceso termina sin errores con el TIPO ALTA ROTACIÓN
-- **THEN** el usuario ve las rutas de los cuatro ficheros, el TIPO y su nº de artículos, el nº de días contado y el resumen de tiendas, cajas, unidades y avisos
+- **THEN** el usuario ve las rutas de los cuatro ficheros (con `_AR_` y la fecha en los del palet), el TIPO y su nº de artículos, el nº de días contado y el resumen de tiendas, cajas, unidades y avisos
 
 #### Scenario: Error de validación
 - **WHEN** faltan tiendas del FICHERO BASE en la tabla
