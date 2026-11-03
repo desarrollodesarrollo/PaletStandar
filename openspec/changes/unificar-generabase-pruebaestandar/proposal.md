@@ -7,7 +7,7 @@ Hoy el trabajo se hace en dos pasos con dos programas. Primero GENERABASE genera
 - **Un solo programa.** PRUEBAESTANDAR (misma ventana, mismo nombre y mismo `PRUEBAESTANDAR.exe`) hace en una sola ejecución lo que antes hacían los dos:
   - Entradas: SALALM, MAESTRO, MAESTRO DE CADUCIDAD, MOVIMIENTOS (Access) y TABLA DE TIENDAS Y MEDIOS.
   - Una caja para el nº de artículos.
-  - Un selector de TIPO con tres opciones: ALTA ROTACIÓN, DROGUERÍA y ALIMENTACIÓN.
+  - Un selector de TIPO con cuatro opciones: ALTA ROTACIÓN, DROGUERÍA, ALIMENTACIÓN y TODOS. Con TODOS no se filtra por tipo: el palet se calcula con los N artículos del FICHERO BASE (si pones 1000, con esos 1000).
 - **Orden de la selección.** Primero se toman los N artículos con más CAJAS de SALALM FILTRADO, sea cual sea su tipo; así se forma el FICHERO BASE, que no cambia. Después, de esos N artículos, sólo se usan los del TIPO elegido para calcular el palet estándar.
 - **Nº de días automático.** El nº de días de datos ya no se escribe a mano. **BREAKING:** desaparece la caja de días. El programa lo calcula como el nº de valores distintos de `MVFECI` en las filas del Access con `MVTMOV = "PI"`.
 - **Salidas.** Se generan 4 ficheros en la carpeta del SALALM:
@@ -15,7 +15,7 @@ Hoy el trabajo se hace en dos pasos con dos programas. Primero GENERABASE genera
   - PRUEBAESTANDAR (.xlsx) y REPARTOESTANDAR (.xls), con la misma estructura que ahora:
     - PRUEBAESTANDAR conserva el formato antiguo: CODIGO, PESO, Volumen y UNIxCAJA en A–D, sin la columna TIPO, y las tiendas desde la columna E. Contiene sólo los artículos del TIPO elegido, con ELECCIÓN rellena.
     - REPARTOESTANDAR no cambia de formato. Contiene los artículos del TIPO elegido.
-- **Nombres con TIPO y fecha.** Los nombres de los ficheros llevan la fecha de ejecución (`AAAAMMDD`), y los dos del palet llevan además el TIPO abreviado: AR = ALTA ROTACIÓN, DR = DROGUERÍA, AL = ALIMENTACIÓN. **BREAKING:** desaparecen los nombres fijos `PRUEBAESTANDAR.xlsx` y `REPARTOESTANDAR.xls`. Por ejemplo, el 03/11/2026 con ALTA ROTACIÓN:
+- **Nombres con TIPO y fecha.** Los nombres de los ficheros llevan la fecha de ejecución (`AAAAMMDD`), y los dos del palet llevan además el TIPO abreviado: AR = ALTA ROTACIÓN, DR = DROGUERÍA, AL = ALIMENTACIÓN, TD = TODOS. **BREAKING:** desaparecen los nombres fijos `PRUEBAESTANDAR.xlsx` y `REPARTOESTANDAR.xls`. Por ejemplo, el 03/11/2026 con ALTA ROTACIÓN:
   - `SALALM FILTRADO_20261103.xlsx`
   - `FICHERO BASE_20261103.xlsx`
   - `PRUEBAESTANDAR_AR_20261103.xlsx`

@@ -29,7 +29,7 @@ El sistema MUST aceptar cualquier nº de artículos (filas) y cualquier nº de b
 - **THEN** el máximo de cajas para esa tienda se calcula con 1,5 bultos
 
 ### Requirement: Fichero de salida PRUEBAESTANDAR.xlsx
-Al terminar correctamente, el sistema SHALL guardar la base del TIPO como `PRUEBAESTANDAR_<TIPO>_<AAAAMMDD>.xlsx` en la carpeta del fichero SALALM. El TIPO va abreviado (AR, DR o AL) y la fecha es la de ejecución, según la capacidad `pruebaestandar-integrado`. En ese fichero:
+Al terminar correctamente, el sistema SHALL guardar la base del TIPO como `PRUEBAESTANDAR_<TIPO>_<AAAAMMDD>.xlsx` en la carpeta del fichero SALALM. El TIPO va abreviado (AR, DR, AL o TD) y la fecha es la de ejecución, según la capacidad `pruebaestandar-integrado`. En ese fichero:
 - cada celda ELECCIÓN de un artículo seleccionado MUST contener un número entero ≥ 1 (tipo numérico, no texto);
 - cada celda ELECCIÓN de un artículo no seleccionado MUST quedar vacía;
 - el resto de celdas MUST tener los valores de la base del TIPO: CODIGO, PESO, Volumen, UNIxCAJA, y BULTOS y LINEAS de cada tienda. No hay columna TIPO.

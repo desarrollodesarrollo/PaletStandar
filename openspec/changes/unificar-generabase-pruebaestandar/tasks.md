@@ -74,9 +74,25 @@
 - [x] 5.1 Añadir `access-parser==0.0.6` a `requirements.txt` y `generabase/**` a los `paths` de `.github/workflows/compilar-exe.yml`. Verificar que en un entorno nuevo `pip install -r requirements-dev.txt` instala todo y que `python -m pytest -q` pasa (`tests` y `tests_generabase`).
 - [x] 5.2 Actualizar la sección PRUEBAESTANDAR del `README.md`: entradas, TIPO, días automáticos, 4 salidas con TIPO (AR/DR/AL) y fecha en el nombre y reutilización al cambiar de TIPO. La sección de GENERABASE se mantiene. Verificar releyendo que no queda ninguna mención a escribir los días a mano.
 - [x] 5.3 Hacer push y comprobar que el workflow «Compilar PRUEBAESTANDAR.exe» termina en verde, con la ventana PRUEBAESTANDAR abierta en el smoke check y el artefacto `PRUEBAESTANDAR-windows` disponible. Ejecutar `graphify update .`.
-- [ ] 5.4 Prueba del usuario con sus ficheros reales. Verificar con el usuario que:
+- [x] 5.4 Prueba del usuario con sus ficheros reales. Verificar con el usuario que:
   - una ejecución con ALTA ROTACIÓN genera los 4 ficheros;
   - una segunda con DROGUERÍA no relee el Access;
   - el nº de días coincide con su consulta en Access (valores distintos de MVFECI con MVTMOV = "PI");
   - los nombres llevan el TIPO (AR/DR/AL) y la fecha del día;
   - `REPARTOESTANDAR_<TIPO>_<fecha>.xls` se importa bien en su programa, aunque ya no se llame `REPARTOESTANDAR.xls`.
+
+## 6. TIPO «TODOS»
+
+- [ ] 6.1 En `pruebaestandar/integrado.py`, añadir `TODOS` a `TIPOS` (al final) y `TD` a `ABREVIATURAS`. Con TODOS, `filtrar_tipo` devuelve todos los artículos y `verificar_base_tipo` compara todas las filas. El mensaje de «Elige el TIPO» debe listar los cuatro. Verificar con pruebas en `tests/test_integrado.py` que:
+  - `filtrar_tipo(…, "todos")` devuelve todos en orden;
+  - TODOS con el FICHERO BASE vacío da error;
+  - `verificar_base_tipo` con TODOS pasa y detecta una alteración;
+  - `rutas_salida(…, "TODOS", 03/11/2026)` da `PRUEBAESTANDAR_TD_20261103.xlsx` y `REPARTOESTANDAR_TD_20261103.xls`;
+  - de extremo a extremo con TODOS y N = 3, PRUEBAESTANDAR y REPARTOESTANDAR tienen los 3 artículos del FICHERO BASE en su orden y el resumen dice `TODOS: 3 artículos de los 3 del FICHERO BASE`.
+- [ ] 6.2 Añadir TODOS al Combobox de la ventana (cuarta opción). Verificar con `xvfb-run pytest tests/test_gui.py` que:
+  - las opciones son las cuatro en orden;
+  - una ejecución con TODOS genera `PRUEBAESTANDAR_TD_<fecha>.xlsx` y `REPARTOESTANDAR_TD_<fecha>.xls`;
+  - cambiar de un TIPO a TODOS no relee el Access.
+- [ ] 6.3 Actualizar el README (selector con TODOS, abreviatura TD). Verificar releyendo la sección PRUEBAESTANDAR.
+- [ ] 6.4 Pasar todas las pruebas (`xvfb-run python -m pytest`), ejecutar `graphify update .`, hacer push y comprobar que «Compilar PRUEBAESTANDAR.exe» termina en verde con el artefacto disponible.
+- [ ] 6.5 Prueba del usuario con TODOS y N = 1000. Verificar con el usuario que PRUEBAESTANDAR_TD y REPARTOESTANDAR_TD tienen los 1000 artículos y que el reparto se importa bien.

@@ -16,13 +16,17 @@ En cada ejecución, el sistema SHALL generar SALALM FILTRADO y FICHERO BASE con 
 - **THEN** los dos FICHERO BASE generados tienen el mismo contenido
 
 ### Requirement: Selección del TIPO de palet estándar
-El usuario SHALL elegir uno de estos tres TIPOS de palet estándar: `ALTA ROTACIÓN`, `DROGUERÍA` o `ALIMENTACIÓN`. Primero se forman los N artículos del FICHERO BASE. Después, el palet estándar se calcula sólo con los artículos del FICHERO BASE cuya columna B (TIPO) coincide con el TIPO elegido. La comparación no distingue mayúsculas, tildes ni espacios extremos. Esos artículos se usan en el mismo orden en que aparecen en el FICHERO BASE.
+El usuario SHALL elegir uno de estos cuatro TIPOS de palet estándar: `ALTA ROTACIÓN`, `DROGUERÍA`, `ALIMENTACIÓN` o `TODOS`. Primero se forman los N artículos del FICHERO BASE. Después, el palet estándar se calcula sólo con los artículos del FICHERO BASE cuya columna B (TIPO) coincide con el TIPO elegido. Con `TODOS` no se filtra: el palet se calcula con todos los artículos del FICHERO BASE, es decir, los N indicados por el usuario, o todos los de SALALM FILTRADO si hay menos. La comparación no distingue mayúsculas, tildes ni espacios extremos. Esos artículos se usan en el mismo orden en que aparecen en el FICHERO BASE.
 
-Si ningún artículo del FICHERO BASE es del TIPO elegido, el sistema MUST mostrar un error que lo diga, con el TIPO y N, y MUST NOT guardar ningún fichero. Si hay menos artículos del TIPO que N, no es un error: el resumen SHALL indicar cuántos hay.
+Si ningún artículo del FICHERO BASE es del TIPO elegido (o, con `TODOS`, si el FICHERO BASE no tiene artículos), el sistema MUST mostrar un error que lo diga, con el TIPO y N, y MUST NOT guardar ningún fichero. Si hay menos artículos del TIPO que N, no es un error: el resumen SHALL indicar cuántos hay.
 
 #### Scenario: Artículos de un TIPO
 - **WHEN** el FICHERO BASE tiene 1000 artículos, de ellos 412 de ALTA ROTACIÓN, y el usuario elige ALTA ROTACIÓN
 - **THEN** PRUEBAESTANDAR y REPARTOESTANDAR (`_AR_`) contienen esos 412 artículos, en el orden del FICHERO BASE, y el resumen indica `ALTA ROTACIÓN: 412 artículos de los 1000 del FICHERO BASE`
+
+#### Scenario: TODOS los artículos
+- **WHEN** el usuario indica N = 1000, el FICHERO BASE tiene 1000 artículos de los tres tipos y el usuario elige TODOS
+- **THEN** PRUEBAESTANDAR y REPARTOESTANDAR (`_TD_`) contienen los 1000 artículos, en el orden del FICHERO BASE, y el resumen indica `TODOS: 1000 artículos de los 1000 del FICHERO BASE`
 
 #### Scenario: Ningún artículo del TIPO
 - **WHEN** ninguno de los N artículos del FICHERO BASE es de DROGUERÍA y el usuario elige DROGUERÍA
@@ -49,7 +53,7 @@ Las filas PI con `MVFECI` vacío no se cuentan, y el resumen SHALL avisar de cu�
 Para calcular el palet estándar, el sistema SHALL formar la base del TIPO con la estructura de fichero base de la capacidad `ficheros-excel`:
 - `CODIGO`, `PESO (Kg)`, `Volumen (L)` y `UNIxCAJA` en A–D.
 - Bloques `BULTOS`, `LINEAS`, `ELECCIÓN` desde la columna E, uno por cada tienda del FICHERO BASE, en el mismo orden y con el mismo código de tienda.
-- Una fila por artículo del TIPO, con los mismos valores que su fila del FICHERO BASE, sin la columna TIPO.
+- Una fila por artículo del TIPO (con `TODOS`, por cada artículo del FICHERO BASE), con los mismos valores que su fila del FICHERO BASE, sin la columna TIPO.
 
 Antes de guardar, el sistema MUST comprobar que cada fila de la base del TIPO coincide con la fila del mismo artículo en el FICHERO BASE. Las celdas que se comparan son CODIGO, PESO, Volumen, UNIxCAJA, y BULTOS y LINEAS de cada tienda. Si no coinciden, MUST NOT guardar ningún fichero.
 
@@ -88,6 +92,7 @@ Las abreviaturas del TIPO son:
 - `AR`: ALTA ROTACIÓN
 - `DR`: DROGUERÍA
 - `AL`: ALIMENTACIÓN
+- `TD`: TODOS
 
 La fecha es la del PC en el momento de pulsar `Ejecutar`. Es la misma en los cuatro nombres, en la confirmación de sobrescritura y en el resumen, aunque el proceso termine después de medianoche. Si se reintenta el guardado, se mantienen los mismos nombres.
 
@@ -100,6 +105,10 @@ Calcular otro TIPO el mismo día genera un PRUEBAESTANDAR y un REPARTOESTANDAR n
 #### Scenario: Otro TIPO el mismo día
 - **WHEN** ese mismo día el usuario ejecuta después con DROGUERÍA
 - **THEN** se generan `PRUEBAESTANDAR_DR_20261103.xlsx` y `REPARTOESTANDAR_DR_20261103.xls`, y `PRUEBAESTANDAR_AR_20261103.xlsx` y `REPARTOESTANDAR_AR_20261103.xls` no cambian
+
+#### Scenario: Nombres con TODOS
+- **WHEN** ese mismo día el usuario ejecuta con TODOS
+- **THEN** se generan `PRUEBAESTANDAR_TD_20261103.xlsx` y `REPARTOESTANDAR_TD_20261103.xls`
 
 #### Scenario: Ejecución que cruza la medianoche
 - **WHEN** el usuario pulsa Ejecutar a las 23:55 del 3 de noviembre de 2026 y el guardado ocurre a las 00:05 del día 4

@@ -9,14 +9,14 @@ Al iniciar PRUEBAESTANDAR, el sistema SHALL abrir una ventana titulada `PRUEBAES
   - MOVIMIENTOS (Access, `.accdb` o `.mdb`),
   - TABLA DE TIENDAS Y MEDIOS (`.xlsx`);
 - una caja de texto para el nº de artículos del FICHERO BASE;
-- un selector de TIPO de palet estándar con las opciones `ALTA ROTACIÓN`, `DROGUERÍA` y `ALIMENTACIÓN`, sin ninguna elegida al abrir;
+- un selector de TIPO de palet estándar con las opciones `ALTA ROTACIÓN`, `DROGUERÍA`, `ALIMENTACIÓN` y `TODOS`, en ese orden y sin ninguna elegida al abrir;
 - un botón `Ejecutar`.
 
 La ventana MUST NOT tener caja para el nº de días de datos, porque se calcula desde el Access. Todos los textos MUST estar en español.
 
 #### Scenario: Apertura del programa
 - **WHEN** el usuario inicia PRUEBAESTANDAR
-- **THEN** ve los cinco selectores de fichero, la caja del nº de artículos, el selector de TIPO sin valor, el botón Ejecutar y ninguna caja de días
+- **THEN** ve los cinco selectores de fichero, la caja del nº de artículos, el selector de TIPO sin valor y con las cuatro opciones, el botón Ejecutar y ninguna caja de días
 
 ### Requirement: Validación de datos antes de ejecutar
 Al pulsar `Ejecutar`, el sistema MUST comprobar que:
@@ -40,7 +40,7 @@ Si falta algo, SHALL mostrar un mensaje que indique qué falta y no iniciar el p
 
 #### Scenario: Falta el TIPO
 - **WHEN** el usuario pulsa Ejecutar sin haber elegido TIPO
-- **THEN** ve un mensaje pidiendo elegir el TIPO de palet estándar (ALTA ROTACIÓN, DROGUERÍA o ALIMENTACIÓN)
+- **THEN** ve un mensaje pidiendo elegir el TIPO de palet estándar (ALTA ROTACIÓN, DROGUERÍA, ALIMENTACIÓN o TODOS)
 
 ### Requirement: Ejecución y confirmación de sobrescritura
 Durante el proceso, la ventana MUST seguir respondiendo y el botón `Ejecutar` MUST estar desactivado. SHALL mostrarse la fase en curso, por ejemplo la lectura del Access, que puede tardar unos minutos.

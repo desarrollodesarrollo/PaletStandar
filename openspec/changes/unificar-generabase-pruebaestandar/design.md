@@ -74,7 +74,7 @@ En `generabase/access.filtrar` se añade, sin cambiar nada de lo existente, el c
   - Guarda los 4 ficheros en orden: SALALM FILTRADO, FICHERO BASE, PRUEBAESTANDAR, REPARTOESTANDAR.
   - Cada guardado ya es reintentable (`ErrorEscritura`).
   - Al reintentar, vuelve a guardar los 4. Es idempotente y cada uno se escribe con un fichero temporal más `os.replace` o con `escritura.guardar`.
-- `TIPOS = ("ALTA ROTACIÓN", "DROGUERÍA", "ALIMENTACIÓN")`, con los mismos textos que `salalm.tipo_ubicacion`.
+- `TIPOS = ("ALTA ROTACIÓN", "DROGUERÍA", "ALIMENTACIÓN", "TODOS")`. Los tres primeros usan los mismos textos que `salalm.tipo_ubicacion`. `TODOS = "TODOS"` es una constante aparte (decisión 10).
 
 ### 6. Reutilización entre ejecuciones (caché en la ventana)
 La ventana guarda el último `Datos` junto con su `clave`. La clave se forma con:
@@ -97,7 +97,7 @@ Al ejecutar, si la clave coincide, se salta `preparar` y se pasa directamente a 
 - La validación mira, por orden, los ficheros en el orden de la ventana, después N y después TIPO.
 
 ### 8. Nombres con TIPO y fecha
-- `integrado.ABREVIATURAS = {"ALTA ROTACIÓN": "AR", "DROGUERÍA": "DR", "ALIMENTACIÓN": "AL"}`.
+- `integrado.ABREVIATURAS = {"ALTA ROTACIÓN": "AR", "DROGUERÍA": "DR", "ALIMENTACIÓN": "AL", "TODOS": "TD"}`.
 - `integrado.rutas_salida(ruta_salalm, tipo, fecha: date) -> RutasSalida(salalm, base, prueba, reparto)` devuelve:
   - `SALALM FILTRADO_{f}.xlsx`
   - `FICHERO BASE_{f}.xlsx`
@@ -116,8 +116,19 @@ Al ejecutar, si la clave coincide, se salta `preparar` y se pasa directamente a 
 - PyInstaller encuentra `generabase` y `access_parser` por import.
 - Las pruebas del workflow siguen siendo `tests`. Las de `tests_generabase` ya tienen su propio workflow.
 
+### 10. TIPO «TODOS»
+`TODOS` es un TIPO más del selector y del flujo, con la abreviatura `TD`. Sólo cambia el filtro:
+- `filtrar_tipo(elegidos, TODOS)` devuelve todos los artículos del FICHERO BASE, en su orden. Si el FICHERO BASE no tiene artículos, da el error de siempre.
+- `verificar_base_tipo(libro_tipo, libro_base, TODOS)` compara todas las filas de la hoja TODOS, sin filtrar por la columna B.
+- La hoja de la base del TIPO se llama `TODOS`, como el resto de TIPOS, que usan su nombre.
+- Todo lo demás es igual que para los otros TIPOS: la estructura antigua sin la columna TIPO, los días, la verificación, los nombres de fichero y la reutilización de lo leído del Access.
+
+La comparación de `TODOS` es exacta tras normalizar. Ninguna ubicación de SALALM se llama «TODOS», así que no puede confundirse con un tipo real.
+- *Alternativa descartada:* una casilla aparte, «sin filtrar por tipo». Sería un control más, cuando el usuario lo pidió como una opción del selector.
+
 ## Risks / Trade-offs
 
+- [Con TODOS y N grande, cada tienda tiene más candidatos] → El algoritmo no cambia y la prueba de rendimiento de 1000 × 180 ya cubre el caso de 1000 artículos en un mismo palet (11 s).
 - [El FICHERO BASE de 1000 artículos puede tener pocos de un TIPO] → El resumen muestra «TIPO: k artículos de los N». Si k = 0, hay un error claro que sugiere aumentar N.
 - [El programa de importación podría buscar el nombre fijo `REPARTOESTANDAR.xls`] → Se ha cambiado el nombre porque lo pidió el usuario, y el formato interno no cambia. Lo comprobará el usuario en la tarea 5.4. Si su programa exige el nombre fijo, basta con renombrar el fichero o seleccionarlo.
 - [Con otro N el mismo día, SALALM FILTRADO y FICHERO BASE de ese día se sobrescriben] → La confirmación única los nombra. Los ficheros del palet de otros TIPOS no se tocan.
