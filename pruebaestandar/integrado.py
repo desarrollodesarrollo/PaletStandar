@@ -29,8 +29,9 @@ from generabase.salida import guardar_xlsx
 from . import proceso
 from .modelo import ErrorEscritura, ErrorValidacion
 
-TIPOS = ("ALTA ROTACIÓN", "DROGUERÍA", "ALIMENTACIÓN")
-ABREVIATURAS = {"ALTA ROTACIÓN": "AR", "DROGUERÍA": "DR", "ALIMENTACIÓN": "AL"}
+TODOS = "TODOS"  # sin filtrar por tipo: todos los artículos del FICHERO BASE
+TIPOS = ("ALTA ROTACIÓN", "DROGUERÍA", "ALIMENTACIÓN", TODOS)
+ABREVIATURAS = {"ALTA ROTACIÓN": "AR", "DROGUERÍA": "DR", "ALIMENTACIÓN": "AL", TODOS: "TD"}
 
 # Los dos paquetes tienen sus propias excepciones; la ventana trata ambas igual.
 ERRORES_VALIDACION = (ErrorValidacion, modelo_gb.ErrorValidacion)
@@ -63,16 +64,23 @@ def tipo_canonico(tipo) -> str:
     for t in TIPOS:
         if normalizar_tipo(t) == buscado:
             return t
-    raise ErrorValidacion("Elige el TIPO de palet estándar: ALTA ROTACIÓN, DROGUERÍA o ALIMENTACIÓN.")
+    raise ErrorValidacion("Elige el TIPO de palet estándar: ALTA ROTACIÓN, DROGUERÍA, ALIMENTACIÓN o TODOS.")
 
 
 def filtrar_tipo(elegidos: list, tipo: str, n_pedido: int | None = None) -> list:
-    """Artículos del FICHERO BASE de ese TIPO, en el mismo orden."""
+    """Artículos del FICHERO BASE de ese TIPO (con TODOS, todos), en el mismo orden."""
     tipo = tipo_canonico(tipo)
+    n = len(elegidos) if n_pedido is None else n_pedido
+    if tipo == TODOS:
+        if not elegidos:
+            raise ErrorValidacion(
+                f"El FICHERO BASE no tiene artículos (nº de artículos pedido: {_miles(n)}). "
+                "No se ha generado ningún fichero."
+            )
+        return list(elegidos)
     buscado = normalizar_tipo(tipo)
     del_tipo = [a for a in elegidos if normalizar_tipo(a.tipo_ubicacion) == buscado]
     if not del_tipo:
-        n = len(elegidos) if n_pedido is None else n_pedido
         raise ErrorValidacion(
             f"No hay artículos de {tipo} entre los {_miles(len(elegidos))} artículos del FICHERO BASE "
             f"(nº de artículos pedido: {_miles(n)}). Prueba con un nº de artículos mayor. "
@@ -108,11 +116,13 @@ def _es_eleccion(col: int, primera_tienda: int) -> bool:
 def verificar_base_tipo(libro_tipo: Workbook, libro_base: Workbook, tipo: str) -> int:
     """Compara celda a celda la base del TIPO con las filas de ese TIPO de la hoja TODOS (quitando la columna B).
 
-    No compara las columnas ELECCIÓN. Devuelve el nº de artículos comprobados.
+    Con el TIPO TODOS se comparan todas las filas. No compara las columnas ELECCIÓN. Devuelve el nº de artículos
+    comprobados.
     """
+    todos = tipo_canonico(tipo) == TODOS
     buscado = normalizar_tipo(tipo)
     base = list(libro_base[fichero_base.HOJA].iter_rows(values_only=True))
-    esperadas = base[:2] + [f for f in base[2:] if normalizar_tipo(f[1]) == buscado]
+    esperadas = base[:2] + [f for f in base[2:] if todos or normalizar_tipo(f[1]) == buscado]
     esperadas = [tuple(f[:1]) + tuple(f[2:]) for f in esperadas]
     escritas = list(libro_tipo.worksheets[0].iter_rows(values_only=True))
 

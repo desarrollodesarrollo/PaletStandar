@@ -2,7 +2,7 @@
 
 Programa de escritorio que, en una sola ejecución:
 1. Genera el **SALALM FILTRADO** y el **FICHERO BASE** (como GENERABASE) a partir del SALALM, el MAESTRO, el MAESTRO DE CADUCIDAD y el Access de MOVIMIENTOS.
-2. Calcula el **palet estándar** del TIPO elegido (ALTA ROTACIÓN, DROGUERÍA o ALIMENTACIÓN). Para cada tienda decide el nº de cajas de cada artículo que irá en su medio (palet o carros). Respeta un llenado máximo del 96 % del peso y el volumen del medio y su densidad, y da prioridad a los artículos con más líneas de pedido.
+2. Calcula el **palet estándar** del TIPO elegido (ALTA ROTACIÓN, DROGUERÍA, ALIMENTACIÓN o TODOS). Para cada tienda decide el nº de cajas de cada artículo que irá en su medio (palet o carros). Respeta un llenado máximo del 96 % del peso y el volumen del medio y su densidad, y da prioridad a los artículos con más líneas de pedido.
 3. Guarda **PRUEBAESTANDAR** (la elección en cajas) y **REPARTOESTANDAR** (la elección en unidades, para importarla en otro programa).
 
 La forma más cómoda de usarlo en Windows es el ejecutable `PRUEBAESTANDAR.exe`, que no necesita Python. Se descarga como zip desde la pestaña **Actions** del repositorio, en la ejecución «Compilar PRUEBAESTANDAR.exe» (apartado *Artifacts*).
@@ -24,16 +24,16 @@ La forma más cómoda de usarlo en Windows es el ejecutable `PRUEBAESTANDAR.exe`
    - el Access de **MOVIMIENTOS** (`.accdb` o `.mdb`),
    - la **TABLA DE TIENDAS Y MEDIOS** (`.xlsx`).
 3. Escribe el **nº de artículos** del FICHERO BASE (entero mayor que 0).
-4. Elige el **TIPO** de palet estándar: ALTA ROTACIÓN, DROGUERÍA o ALIMENTACIÓN.
+4. Elige el **TIPO** de palet estándar: ALTA ROTACIÓN, DROGUERÍA, ALIMENTACIÓN o **TODOS**. Con TODOS no se filtra por tipo: el palet se calcula con todos los artículos del FICHERO BASE (si pones 1000, con esos 1000).
 5. Pulsa **Ejecutar**. Leer el Access es lo que más tarda (unos minutos con el Access real; mejor si está copiado en el propio PC que en una carpeta de red). La ventana muestra en qué fase está.
 
 **El nº de días de datos ya no se escribe:** el programa lo calcula como el nº de valores distintos de `MVFECI` en las filas del Access con `MVTMOV = "PI"` (de cualquier tienda). Ese número es el que se usa en el máximo de cajas por artículo.
 
-**Orden de la selección:** primero se toman los N artículos con más CAJAS del SALALM FILTRADO, de cualquier tipo (así se forma el FICHERO BASE). Después, de esos N, el palet se calcula sólo con los del TIPO elegido. Por eso puede haber menos artículos que N; el resumen dice cuántos hay. Si no hay ninguno, el programa lo avisa y no genera nada.
+**Orden de la selección:** primero se toman los N artículos con más CAJAS del SALALM FILTRADO, de cualquier tipo (así se forma el FICHERO BASE). Después, de esos N, el palet se calcula sólo con los del TIPO elegido (con TODOS, con los N). Por eso, con un TIPO concreto, puede haber menos artículos que N; el resumen dice cuántos hay. Si no hay ninguno, el programa lo avisa y no genera nada.
 
 ### Ficheros generados
 
-En la carpeta del SALALM se guardan 4 ficheros. Llevan la **fecha de ejecución** (`AAAAMMDD`) y, los dos del palet, el **TIPO abreviado**: `AR` = ALTA ROTACIÓN, `DR` = DROGUERÍA y `AL` = ALIMENTACIÓN. Por ejemplo, el 03/11/2026 con ALTA ROTACIÓN:
+En la carpeta del SALALM se guardan 4 ficheros. Llevan la **fecha de ejecución** (`AAAAMMDD`) y, los dos del palet, el **TIPO abreviado**: `AR` = ALTA ROTACIÓN, `DR` = DROGUERÍA, `AL` = ALIMENTACIÓN y `TD` = TODOS. Por ejemplo, el 03/11/2026 con ALTA ROTACIÓN:
 
 | Fichero | Contenido |
 |---|---|

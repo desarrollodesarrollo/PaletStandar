@@ -71,7 +71,7 @@ def test_ventana_principal(app):
     assert app.root.title() == "PRUEBAESTANDAR"
     assert [c for c, _, _ in gui.ENTRADAS] == ["salalm", "maestro", "caducidad", "access", "tabla"]
     assert all(e.cget("text") == "(sin seleccionar)" for e in app.etiquetas.values())
-    assert list(app.cmb_tipo.cget("values")) == ["ALTA ROTACIÓN", "DROGUERÍA", "ALIMENTACIÓN"]
+    assert list(app.cmb_tipo.cget("values")) == ["ALTA ROTACIÓN", "DROGUERÍA", "ALIMENTACIÓN", "TODOS"]
     assert app.var_tipo.get() == "" and str(app.cmb_tipo.cget("state")) == "readonly"
     assert app.var_n.get() == "" and app.btn_ejecutar.cget("text") == "Ejecutar"
     assert not hasattr(app, "var_dias") and not hasattr(app, "ent_dias")
@@ -102,7 +102,7 @@ def test_n_no_valido(app, monkeypatch, ficheros):
 def test_falta_el_tipo(app, monkeypatch, ficheros):
     preparar(app, monkeypatch, ficheros, tipo="")
     app.ejecutar()
-    assert app.avisos == [("showwarning", "Elige el TIPO de palet estándar: ALTA ROTACIÓN, DROGUERÍA o ALIMENTACIÓN.")]
+    assert app.avisos == [("showwarning", "Elige el TIPO de palet estándar: ALTA ROTACIÓN, DROGUERÍA, ALIMENTACIÓN o TODOS.")]
     assert not app.ocupado
 
 
@@ -158,6 +158,22 @@ def test_ejecucion_correcta_y_segundo_tipo_sin_releer(app, monkeypatch, ficheros
     assert app.avisos[-1][0] == "showinfo"
     assert "PRUEBAESTANDAR_DR_20261103.xlsx" in generados(carpeta)
     assert "Se han reutilizado el FICHERO BASE y los días" in app.txt_resumen.get("1.0", "end")
+
+
+def test_todos_y_cambio_desde_otro_tipo_sin_releer(app, monkeypatch, ficheros):
+    carpeta = ficheros[0].parent
+    preparar(app, monkeypatch, ficheros, tipo="ALTA ROTACIÓN")
+    app.ejecutar()
+    esperar(app)
+    monkeypatch.setattr(access, "leer_movimientos", lambda *a: pytest.fail("no debe releer el Access"))
+    monkeypatch.setattr(gui.messagebox, "askyesno", lambda *a: True)
+    app.var_tipo.set("TODOS")
+    app.ejecutar()
+    esperar(app)
+    assert app.avisos[-1][0] == "showinfo"
+    assert {"PRUEBAESTANDAR_TD_20261103.xlsx", "REPARTOESTANDAR_TD_20261103.xls"} <= set(generados(carpeta))
+    resumen = app.txt_resumen.get("1.0", "end")
+    assert "TODOS: 3 artículos de los 3 del FICHERO BASE." in resumen and "Se han reutilizado" in resumen
 
 
 def test_cambiar_n_vuelve_a_leer(app, monkeypatch, ficheros):

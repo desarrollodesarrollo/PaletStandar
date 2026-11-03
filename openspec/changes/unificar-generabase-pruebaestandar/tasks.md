@@ -83,16 +83,16 @@
 
 ## 6. TIPO «TODOS»
 
-- [ ] 6.1 En `pruebaestandar/integrado.py`, añadir `TODOS` a `TIPOS` (al final) y `TD` a `ABREVIATURAS`. Con TODOS, `filtrar_tipo` devuelve todos los artículos y `verificar_base_tipo` compara todas las filas. El mensaje de «Elige el TIPO» debe listar los cuatro. Verificar con pruebas en `tests/test_integrado.py` que:
+- [x] 6.1 En `pruebaestandar/integrado.py`, añadir `TODOS` a `TIPOS` (al final) y `TD` a `ABREVIATURAS`. Con TODOS, `filtrar_tipo` devuelve todos los artículos y `verificar_base_tipo` compara todas las filas. El mensaje de «Elige el TIPO» debe listar los cuatro. Verificar con pruebas en `tests/test_integrado.py` que:
   - `filtrar_tipo(…, "todos")` devuelve todos en orden;
   - TODOS con el FICHERO BASE vacío da error;
   - `verificar_base_tipo` con TODOS pasa y detecta una alteración;
   - `rutas_salida(…, "TODOS", 03/11/2026)` da `PRUEBAESTANDAR_TD_20261103.xlsx` y `REPARTOESTANDAR_TD_20261103.xls`;
   - de extremo a extremo con TODOS y N = 3, PRUEBAESTANDAR y REPARTOESTANDAR tienen los 3 artículos del FICHERO BASE en su orden y el resumen dice `TODOS: 3 artículos de los 3 del FICHERO BASE`.
-- [ ] 6.2 Añadir TODOS al Combobox de la ventana (cuarta opción). Verificar con `xvfb-run pytest tests/test_gui.py` que:
+- [x] 6.2 Añadir TODOS al Combobox de la ventana (cuarta opción). Verificar con `xvfb-run pytest tests/test_gui.py` que:
   - las opciones son las cuatro en orden;
   - una ejecución con TODOS genera `PRUEBAESTANDAR_TD_<fecha>.xlsx` y `REPARTOESTANDAR_TD_<fecha>.xls`;
   - cambiar de un TIPO a TODOS no relee el Access.
-- [ ] 6.3 Actualizar el README (selector con TODOS, abreviatura TD). Verificar releyendo la sección PRUEBAESTANDAR.
+- [x] 6.3 Actualizar el README (selector con TODOS, abreviatura TD). Verificar releyendo la sección PRUEBAESTANDAR.
 - [ ] 6.4 Pasar todas las pruebas (`xvfb-run python -m pytest`), ejecutar `graphify update .`, hacer push y comprobar que «Compilar PRUEBAESTANDAR.exe» termina en verde con el artefacto disponible.
 - [ ] 6.5 Prueba del usuario con TODOS y N = 1000. Verificar con el usuario que PRUEBAESTANDAR_TD y REPARTOESTANDAR_TD tienen los 1000 artículos y que el reparto se importa bien.

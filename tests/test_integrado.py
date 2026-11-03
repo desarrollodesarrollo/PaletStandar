@@ -244,6 +244,48 @@ def test_texto_del_resumen(entradas, tabla):
     assert "reutilizado" not in sin
 
 
+
+# 6.1 TIPO TODOS
+def test_filtrar_todos_devuelve_todos_en_orden():
+    elegidos = [fila(1, "DROGUERÍA"), fila(2, "ALTA ROTACIÓN"), fila(3, "ALIMENTACIÓN")]
+    assert integrado.tipo_canonico(" todos ") == "TODOS" and integrado.TIPOS[-1] == "TODOS"
+    assert [a.codigo for a in integrado.filtrar_tipo(elegidos, "todos")] == [1, 2, 3]
+    with pytest.raises(ErrorValidacion, match=r"El FICHERO BASE no tiene artículos .*pedido: 5"):
+        integrado.filtrar_tipo([], "TODOS", 5)
+    with pytest.raises(ErrorValidacion, match="ALTA ROTACIÓN, DROGUERÍA, ALIMENTACIÓN o TODOS"):
+        integrado.tipo_canonico("")
+
+
+def test_verificar_base_con_todos():
+    elegidos = [fila(1, "ALTA ROTACIÓN"), fila(2, "DROGUERÍA"), fila(3, "ALIMENTACIÓN")]
+    agregado = {(1, 81): (1.5, 1), (2, 81): (4.0, 2), (3, 82): (2.0, 1)}
+    base = integrado.fichero_base.construir_libro(elegidos, [81, 82], agregado)
+    libro = integrado.construir_base_tipo(integrado.filtrar_tipo(elegidos, "TODOS"), [81, 82], agregado, "TODOS")
+    assert libro.active.title == "TODOS" and integrado.verificar_base_tipo(libro, base, "TODOS") == 3
+    libro.active["H5"] = 9  # BULTOS de la tienda 82 del artículo 3
+    with pytest.raises(ErrorValidacion, match=r"TIPO TODOS .*fila 5, columna H: '9' en lugar de '2'"):
+        integrado.verificar_base_tipo(libro, base, "TODOS")
+
+
+def test_nombres_con_todos(tmp_path):
+    rutas = integrado.rutas_salida(tmp_path / "salalm.xlsx", "TODOS", FECHA)
+    assert (rutas.prueba.name, rutas.reparto.name) == ("PRUEBAESTANDAR_TD_20261103.xlsx", "REPARTOESTANDAR_TD_20261103.xls")
+    assert rutas.base.name == "FICHERO BASE_20261103.xlsx"
+
+
+def test_extremo_a_extremo_con_todos(entradas, tabla):
+    calculo = integrado.calcular_tipo(integrado.preparar(*entradas, "3"), "TODOS", tabla, FECHA)
+    resumen = calculo.guardar()
+    base = contenido(resumen.rutas.base)
+    prueba = contenido(resumen.rutas.prueba)
+    assert [f[0] for f in base[2:]] == [f[0] for f in prueba[2:]] == [102, 101, 103]
+    assert [f[:1] + f[2:] for f in base[2:]] == [[c if (i < 4 or (i - 4) % 3 != 2) else None for i, c in enumerate(f)] for f in prueba[2:]]
+    hoja = xlrd.open_workbook(str(resumen.rutas.reparto)).sheet_by_name("Hoja1")
+    assert hoja.col_values(0)[1:] == [102.0, 101.0, 103.0]
+    assert "TODOS: 3 artículos de los 3 del FICHERO BASE." in resumen.texto()
+    assert "PALET ESTÁNDAR — TIPO TODOS" in resumen.texto()
+
+
 @pytest.mark.lento
 def test_rendimiento_1000x180_sin_contar_el_access(tmp_path):
     import time
