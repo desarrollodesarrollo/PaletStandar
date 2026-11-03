@@ -7,7 +7,7 @@ import xlwt
 from openpyxl.workbook import Workbook
 
 from . import escritura, reparto
-from .lectura import leer_fichero_base, leer_tabla_medios
+from .lectura import extraer_datos_base, leer_fichero_base, leer_tabla_medios
 from .modelo import Resumen
 from .seleccion import parsear_dias, seleccionar
 from .verificacion import verificar, verificar_reparto
@@ -35,6 +35,16 @@ def calcular(ruta_base, ruta_tabla, dias) -> Calculo:
     dias = parsear_dias(dias)
     destino, destino_reparto = rutas_salida(ruta_base)
     libro, datos = leer_fichero_base(Path(ruta_base))
+    return _calcular(libro, datos, ruta_tabla, dias, destino, destino_reparto)
+
+
+def calcular_desde_libro(libro: Workbook, ruta_tabla, dias, destino, destino_reparto) -> Calculo:
+    """Igual que calcular() pero con el fichero base ya en memoria (primera hoja) y las rutas de salida dadas."""
+    dias = parsear_dias(dias)
+    return _calcular(libro, extraer_datos_base(libro.worksheets[0]), ruta_tabla, dias, Path(destino), Path(destino_reparto))
+
+
+def _calcular(libro: Workbook, datos, ruta_tabla, dias: int, destino: Path, destino_reparto: Path) -> Calculo:
     reparto.comprobar_limites(datos)
     medios = leer_tabla_medios(Path(ruta_tabla), [d.tienda for d in datos.tiendas])
 

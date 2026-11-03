@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - "pruebaestandar/**"
+      - "generabase/**"
       - "PRUEBAESTANDAR.pyw"
       - "requirements.txt"
       - ".github/workflows/compilar-exe.yml"
@@ -25,7 +26,7 @@ jobs:
           pip install -r requirements-dev.txt pyinstaller
 
       - name: Pruebas
-        run: python -m pytest -q -m "not lento" --ignore=tests/test_gui.py
+        run: python -m pytest -q -m "not lento" tests tests_generabase --ignore=tests/test_gui.py --ignore=tests_generabase/test_gui.py
 
       - name: Compilar
         run: pyinstaller --noconfirm --clean --onefile --windowed --name PRUEBAESTANDAR PRUEBAESTANDAR.pyw

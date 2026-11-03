@@ -40,12 +40,21 @@ class Resumen:
     avisos: list[str] = field(default_factory=list)
 
     def texto(self) -> str:
+        lineas = ["Ficheros generados:", f"  {self.ruta_salalm}", f"  {self.ruta_base}", ""]
+        lineas += self.lineas_totales() + [""]
+        if self.avisos:
+            lineas.append(f"Avisos ({len(self.avisos)}):")
+            lineas.extend(f"  - {a}" for a in self.avisos[:200])
+            if len(self.avisos) > 200:
+                lineas.append(f"  … y {len(self.avisos) - 200} más.")
+        else:
+            lineas.append("Sin avisos.")
+        return "\n".join(lineas)
+
+    def lineas_totales(self) -> list[str]:
+        """Bloque de SALALM FILTRADO, FICHERO BASE y totales de control del Access (sin rutas ni avisos)."""
         m = self.movimientos
-        lineas = [
-            "Ficheros generados:",
-            f"  {self.ruta_salalm}",
-            f"  {self.ruta_base}",
-            "",
+        return [
             f"SALALM FILTRADO: {_miles(self.filas_filtradas)} artículos de {_miles(self.filas_salalm)} "
             f"({_miles(self.sin_maestro)} de ellos no están en el MAESTRO).",
             "  Excluidos por: " + ", ".join(f"{k} {_miles(v)}" for k, v in self.excluidas.items()),
@@ -59,16 +68,7 @@ class Resumen:
             f"  Suma de CAJAS: {_es(m.total_cajas, 2)}  ·  LINEAS: {_miles(len(m.lineas))}",
             f"  Días distintos (MVFECI): {_miles(m.dias)}  ·  fechas: "
             + (f"{_fecha(m.fecha_min)} – {_fecha(m.fecha_max)}" if m.fecha_min is not None else "—"),
-            "",
         ]
-        if self.avisos:
-            lineas.append(f"Avisos ({len(self.avisos)}):")
-            lineas.extend(f"  - {a}" for a in self.avisos[:200])
-            if len(self.avisos) > 200:
-                lineas.append(f"  … y {len(self.avisos) - 200} más.")
-        else:
-            lineas.append("Sin avisos.")
-        return "\n".join(lineas)
 
 
 @dataclass
@@ -87,9 +87,36 @@ def rutas_salida(ruta_salalm) -> tuple[Path, Path]:
     return salalm.ruta_salalm_filtrado(ruta_salalm), fichero_base.ruta_fichero_base(ruta_salalm)
 
 
+@dataclass
+class DatosGenerados:
+    """Resultado de GENERABASE con los datos intermedios que reutiliza PRUEBAESTANDAR."""
+
+    calculo: Calculo
+    n: int
+    elegidos: list[salalm.FilaSalalm]
+    tiendas: list[int]
+    agregado: dict
+    usados: access.MovimientosUsados
+
+
 def calcular(ruta_salalm, ruta_maestro, ruta_caducidad, ruta_access, n, progreso: Callable[[str], None] = lambda _: None) -> Calculo:
-    n = fichero_base.parsear_n(n)
     ruta_salida_salalm, ruta_salida_base = rutas_salida(ruta_salalm)
+    return calcular_datos(
+        ruta_salalm, ruta_maestro, ruta_caducidad, ruta_access, n, ruta_salida_salalm, ruta_salida_base, progreso
+    ).calculo
+
+
+def calcular_datos(
+    ruta_salalm,
+    ruta_maestro,
+    ruta_caducidad,
+    ruta_access,
+    n,
+    ruta_salida_salalm: Path,
+    ruta_salida_base: Path,
+    progreso: Callable[[str], None] = lambda _: None,
+) -> DatosGenerados:
+    n = fichero_base.parsear_n(n)
 
     progreso("Leyendo SALALM…")
     articulos, avisos = lectura.leer_salalm(Path(ruta_salalm))
@@ -113,8 +140,8 @@ def calcular(ruta_salalm, ruta_maestro, ruta_caducidad, ruta_access, n, progreso
 
     todos_avisos = ([aviso_n] if aviso_n else []) + usados.avisos + avisos + avisos_maestro + avisos_cruce
     resumen = Resumen(
-        ruta_salalm=ruta_salida_salalm,
-        ruta_base=ruta_salida_base,
+        ruta_salalm=Path(ruta_salida_salalm),
+        ruta_base=Path(ruta_salida_base),
         filas_salalm=len(filas),
         filas_filtradas=len(filtradas),
         excluidas=dict(excluidas),
@@ -126,7 +153,8 @@ def calcular(ruta_salalm, ruta_maestro, ruta_caducidad, ruta_access, n, progreso
         movimientos=usados,
         avisos=todos_avisos,
     )
-    return Calculo(libro_salalm=libro_salalm, libro_base=libro_base, resumen=resumen)
+    calculo = Calculo(libro_salalm=libro_salalm, libro_base=libro_base, resumen=resumen)
+    return DatosGenerados(calculo=calculo, n=n, elegidos=elegidos, tiendas=tiendas, agregado=agregado, usados=usados)
 
 
 def ejecutar(*args, **kwargs) -> Resumen:

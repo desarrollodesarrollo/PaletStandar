@@ -35,6 +35,27 @@ class MovimientosUsados:
     articulo_no_valido: int = 0
     tienda_no_valida: int = 0
     avisos: list[str] = field(default_factory=list)
+    # Fechas MVFECI de TODAS las filas PI (de cualquier tienda): nº de días de datos de PRUEBAESTANDAR.
+    fechas_pi: set[int] = field(default_factory=set)
+    pi_sin_fecha: int = 0
+
+    @property
+    def dias_pi(self) -> int:
+        return len(self.fechas_pi)
+
+    @property
+    def fecha_pi_min(self) -> int | None:
+        return min(self.fechas_pi, default=None)
+
+    @property
+    def fecha_pi_max(self) -> int | None:
+        return max(self.fechas_pi, default=None)
+
+    @property
+    def aviso_pi_sin_fecha(self) -> str | None:
+        if not self.pi_sin_fecha:
+            return None
+        return f"Access: {self.pi_sin_fecha} filas PI sin fecha (MVFECI vacío o no válido); no cuentan como día de datos."
 
     @property
     def tiendas(self) -> list[int]:
@@ -123,6 +144,11 @@ def filtrar(movimientos: Movimientos) -> MovimientosUsados:
         if normalizar(c["MVTMOV"][i]) != "PI":
             continue
         usados.filas_pi += 1
+        fecha_pi = entero(c["MVFECI"][i])
+        if fecha_pi is None or fecha_pi <= 0:
+            usados.pi_sin_fecha += 1
+        else:
+            usados.fechas_pi.add(fecha_pi)
         tienda = entero(c["MVDESM"][i])
         if tienda is None:
             usados.tienda_no_valida += 1
