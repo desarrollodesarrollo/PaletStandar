@@ -20,7 +20,7 @@ La forma más cómoda de usarlo en Windows es el ejecutable `PRUEBAESTANDAR.exe`
 
 1. Haz doble clic en `PRUEBAESTANDAR.pyw` (o ejecuta `python -m pruebaestandar`).
 2. Con los botones **Seleccionar…**, elige:
-   - el **SALALM**, el **MAESTRO** y el **MAESTRO DE CADUCIDAD** (`.xlsx`),
+   - el **SALALM**, el **MAESTRO** y el **MAESTRO DE CADUCIDAD** (`.xlsx`). Bajo los dos maestros, la ventana recuerda: «Filtrar para un solo almacén».
    - el Access de **MOVIMIENTOS** (`.accdb` o `.mdb`),
    - la **TABLA DE TIENDAS Y MEDIOS** (`.xlsx`).
 3. Escribe el **nº de artículos** del FICHERO BASE (entero mayor que 0).

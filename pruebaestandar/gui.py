@@ -25,6 +25,9 @@ ENTRADAS = (
     ("tabla", "TABLA DE TIENDAS Y MEDIOS", TIPOS_EXCEL),
 )
 ENTRADAS_GENERABASE = ("salalm", "maestro", "caducidad", "access")
+# Nota informativa bajo algunos selectores (no cambia cómo se leen los ficheros).
+NOTA_UN_ALMACEN = "Filtrar para un solo almacén"
+NOTAS = {"maestro": NOTA_UN_ALMACEN, "caducidad": NOTA_UN_ALMACEN}
 
 
 def hoy() -> date:
@@ -39,6 +42,7 @@ class App:
         self.rutas: dict[str, Path | None] = {clave: None for clave, _, _ in ENTRADAS}
         self.etiquetas: dict[str, ttk.Label] = {}
         self.botones: dict[str, ttk.Button] = {}
+        self.notas: dict[str, ttk.Label] = {}
         self._datos: integrado.Datos | None = None  # parte GENERABASE reutilizable entre ejecuciones
         self._calculo: integrado.CalculoIntegrado | None = None
         self._cola: queue.Queue = queue.Queue()
@@ -50,15 +54,21 @@ class App:
         root.rowconfigure(0, weight=1)
         marco.columnconfigure(1, weight=1)
 
-        for fila, (clave, nombre, tipos) in enumerate(ENTRADAS):
+        fila = 0
+        for clave, nombre, tipos in ENTRADAS:
             ttk.Label(marco, text=f"{nombre}:").grid(row=fila, column=0, sticky="w", pady=3)
             etiqueta = ttk.Label(marco, text=SIN_SELECCION, width=50, relief="sunken", padding=(4, 2))
             etiqueta.grid(row=fila, column=1, sticky="ew", padx=6)
             boton = ttk.Button(marco, text="Seleccionar…", command=lambda c=clave, n=nombre, t=tipos: self.elegir(c, n, t))
             boton.grid(row=fila, column=2)
             self.etiquetas[clave], self.botones[clave] = etiqueta, boton
+            fila += 1
+            if clave in NOTAS:
+                nota = ttk.Label(marco, text=NOTAS[clave], foreground="gray40")
+                nota.grid(row=fila, column=1, sticky="w", padx=8, pady=(0, 3))
+                self.notas[clave] = nota
+                fila += 1
 
-        fila = len(ENTRADAS)
         ttk.Label(marco, text="Nº de artículos del FICHERO BASE:").grid(row=fila, column=0, sticky="w", pady=(8, 3))
         self.var_n = tk.StringVar()
         self.ent_n = ttk.Entry(marco, textvariable=self.var_n, width=10)

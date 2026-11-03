@@ -77,6 +77,14 @@ def test_ventana_principal(app):
     assert not hasattr(app, "var_dias") and not hasattr(app, "ent_dias")
 
 
+def test_nota_un_solo_almacen(app):
+    app.root.update()
+    assert sorted(app.notas) == ["caducidad", "maestro"]
+    assert all(n.cget("text") == "Filtrar para un solo almacén" and n.winfo_ismapped() for n in app.notas.values())
+    for clave in ("maestro", "caducidad"):
+        assert app.notas[clave].grid_info()["row"] == app.etiquetas[clave].grid_info()["row"] + 1
+
+
 def test_selectores_y_filtros(app, monkeypatch, ficheros):
     filtros = elegir(app, monkeypatch, ficheros)
     assert filtros[0] == filtros[4] == gui.TIPOS_EXCEL and filtros[3][0] == ("Bases de datos Access", "*.accdb *.mdb")
