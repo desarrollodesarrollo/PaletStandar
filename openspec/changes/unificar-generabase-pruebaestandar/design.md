@@ -95,7 +95,7 @@ Al ejecutar, si la clave coincide, se salta `preparar` y se pasa directamente a 
 - Si hay un error de escritura, `askretrycancel` llama a `calculo.guardar()` sin recalcular.
 - El resumen une los dos textos: primero los datos de GENERABASE, luego el bloque «PALET ESTÁNDAR — TIPO …».
 - La validación mira, por orden, los ficheros en el orden de la ventana, después N y después TIPO.
-- `NOTAS = {"maestro": NOTA_UN_ALMACEN, "caducidad": NOTA_UN_ALMACEN}`, con `NOTA_UN_ALMACEN = "No puede haber valores repetidos: sólo un almacén."`. Cada nota es un `ttk.Label` en gris, en una fila propia bajo su selector, en la columna del nombre de fichero. Por eso las filas de la rejilla se numeran con un contador y no con el índice de `ENTRADAS`. `ENTRADAS` no cambia (tuplas de 3), así que la validación y las pruebas siguen igual.
+- `NOTAS = {"maestro": NOTA_UN_ALMACEN, "caducidad": NOTA_UN_ALMACEN}`, con `NOTA_UN_ALMACEN = "Filtrar para un solo almacén"`. Cada nota es un `ttk.Label` en gris, en una fila propia bajo su selector, en la columna del nombre de fichero. Por eso las filas de la rejilla se numeran con un contador y no con el índice de `ENTRADAS`. `ENTRADAS` no cambia (tuplas de 3), así que la validación y las pruebas siguen igual.
 - La nota es sólo informativa: GENERABASE.exe no la muestra y la lectura del MAESTRO y del MAESTRO DE CADUCIDAD no cambia, como pidió el usuario. Si un MAARTI se repite, sigue avisando; si un C3CADU se repite, sigue dando error.
 
 ### 8. Nombres con TIPO y fecha

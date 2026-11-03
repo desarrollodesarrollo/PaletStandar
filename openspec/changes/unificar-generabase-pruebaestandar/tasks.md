@@ -101,7 +101,7 @@
 
 - [ ] 7.1 En `pruebaestandar/gui.py`, añadir `NOTA_UN_ALMACEN` y `NOTAS`, y mostrar la nota en gris bajo los selectores del MAESTRO y del MAESTRO DE CADUCIDAD, con las filas de la rejilla numeradas por contador. Verificar con `xvfb-run pytest tests/test_gui.py` que:
   - hay exactamente dos notas, la del `maestro` y la de `caducidad`;
-  - su texto es `No puede haber valores repetidos: sólo un almacén.`;
+  - su texto es `Filtrar para un solo almacén`;
   - las pruebas de la ventana siguen pasando.
 - [ ] 7.2 Mencionar la nota en el README (paso 2 de «Uso» de PRUEBAESTANDAR). Verificar releyendo.
 - [ ] 7.3 Pasar todas las pruebas, ejecutar `graphify update .`, hacer push y comprobar que «Compilar PRUEBAESTANDAR.exe» termina en verde con el artefacto disponible.

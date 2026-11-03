@@ -5,7 +5,7 @@ Hoy el trabajo se hace en dos pasos con dos programas. Primero GENERABASE genera
 ## What Changes
 
 - **Un solo programa.** PRUEBAESTANDAR (misma ventana, mismo nombre y mismo `PRUEBAESTANDAR.exe`) hace en una sola ejecución lo que antes hacían los dos:
-  - Entradas: SALALM, MAESTRO, MAESTRO DE CADUCIDAD, MOVIMIENTOS (Access) y TABLA DE TIENDAS Y MEDIOS. Bajo el MAESTRO y el MAESTRO DE CADUCIDAD se muestra la nota «No puede haber valores repetidos: sólo un almacén.». Es sólo informativa.
+  - Entradas: SALALM, MAESTRO, MAESTRO DE CADUCIDAD, MOVIMIENTOS (Access) y TABLA DE TIENDAS Y MEDIOS. Bajo el MAESTRO y el MAESTRO DE CADUCIDAD se muestra la nota «Filtrar para un solo almacén». Es sólo informativa.
   - Una caja para el nº de artículos.
   - Un selector de TIPO con cuatro opciones: ALTA ROTACIÓN, DROGUERÍA, ALIMENTACIÓN y TODOS. Con TODOS no se filtra por tipo: el palet se calcula con los N artículos del FICHERO BASE (si pones 1000, con esos 1000).
 - **Orden de la selección.** Primero se toman los N artículos con más CAJAS de SALALM FILTRADO, sea cual sea su tipo; así se forma el FICHERO BASE, que no cambia. Después, de esos N artículos, sólo se usan los del TIPO elegido para calcular el palet estándar.
